@@ -22,7 +22,7 @@ export default function RetrospectivePage() {
 
 function RetrospectiveContent() {
   const { user } = useAuth();
-  const [templateType, setTemplateType] = useState<'KPT' | 'PMI' | 'FREE'>('KPT');
+  const [templateType, setTemplateType] = useState<'KPT' | 'PMI' | 'FREE'>('FREE');
   const [savedMessage, setSavedMessage] = useState<string>('');
   const [saving, setSaving] = useState(false);
 
@@ -104,6 +104,12 @@ function RetrospectiveContent() {
         <CardContent>
           <div className="flex space-x-4">
             <Button
+              variant={templateType === 'FREE' ? 'default' : 'outline'}
+              onClick={() => setTemplateType('FREE')}
+            >
+              자유 작성
+            </Button>
+            <Button
               variant={templateType === 'KPT' ? 'default' : 'outline'}
               onClick={() => setTemplateType('KPT')}
             >
@@ -115,14 +121,13 @@ function RetrospectiveContent() {
             >
               PMI 템플릿
             </Button>
-            <Button
-              variant={templateType === 'FREE' ? 'default' : 'outline'}
-              onClick={() => setTemplateType('FREE')}
-            >
-              자유 작성
-            </Button>
           </div>
           <div className="mt-4 text-sm text-gray-600">
+            {templateType === 'FREE' && (
+              <p>
+                <strong>자유 작성:</strong> 형식에 구애받지 않고 오늘의 경험과 생각을 자유롭게 기록합니다.
+              </p>
+            )}
             {templateType === 'KPT' && (
               <p>
                 <strong>KPT 템플릿:</strong> Keep (계속할 것), Problem (문제점), Try (시도할 것)으로 구성된 회고 방식입니다.
@@ -131,11 +136,6 @@ function RetrospectiveContent() {
             {templateType === 'PMI' && (
               <p>
                 <strong>PMI 템플릿:</strong> Plus (좋았던 것), Minus (아쉬웠던 것), Interesting (흥미로웠던 것)으로 구성된 회고 방식입니다.
-              </p>
-            )}
-            {templateType === 'FREE' && (
-              <p>
-                <strong>자유 작성:</strong> 형식에 구애받지 않고 오늘의 경험과 생각을 자유롭게 기록합니다.
               </p>
             )}
           </div>
