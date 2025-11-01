@@ -42,11 +42,14 @@ export function FreeTemplate({ initialData, onSave, saving = false }: FreeTempla
     let isMounted = true;
 
     async function createEditor() {
-      if (!holderRef.current) {
+      if (!holderRef.current || editorRef.current) {
         return;
       }
 
       setLoadingEditor(true);
+
+      // Strict Mode에서 중복 마운트를 대비해 기존 내용을 초기화
+      holderRef.current.innerHTML = '';
 
       try {
         const [
@@ -70,6 +73,10 @@ export function FreeTemplate({ initialData, onSave, saving = false }: FreeTempla
           import('editorjs-toggle-block'),
           import('editorjs-drag-drop'),
         ]);
+
+        if (!isMounted || !holderRef.current || editorRef.current) {
+          return;
+        }
 
         const editor = new EditorJSModule({
           holder: holderRef.current,
@@ -195,6 +202,10 @@ export function FreeTemplate({ initialData, onSave, saving = false }: FreeTempla
 
         await editor.isReady;
 
+        if (!isMounted) {
+          return;
+        }
+
         new DragDrop(editor);
 
         if (isMounted) {
@@ -216,6 +227,10 @@ export function FreeTemplate({ initialData, onSave, saving = false }: FreeTempla
       if (editorRef.current) {
         editorRef.current.destroy();
         editorRef.current = null;
+      }
+
+      if (holderRef.current) {
+        holderRef.current.innerHTML = '';
       }
     };
   }, [initialEditorData]);
