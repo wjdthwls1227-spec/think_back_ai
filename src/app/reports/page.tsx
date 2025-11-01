@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { formatDate, getWeekRange } from '@/lib/utils';
+import { extractPlainTextFromFreeContent, formatDate, getWeekRange } from '@/lib/utils';
 import { RetrospectiveEntry, WeeklyReport, KPTContent, PMIContent, FreeContent } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -122,8 +122,9 @@ function ReportsContent() {
 
     freeEntries.forEach(entry => {
       const content = entry.content as FreeContent;
-      if (content.text) {
-        freeHighlights.push(content.text);
+      const plainText = extractPlainTextFromFreeContent(content);
+      if (plainText) {
+        freeHighlights.push(plainText);
       }
     });
 

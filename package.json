@@ -9,6 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@editorjs/checklist": "^1.4.0",
+    "@editorjs/editorjs": "^2.30.6",
+    "@editorjs/header": "^2.8.1",
+    "@editorjs/list": "^1.8.1",
+    "@editorjs/paragraph": "^2.10.1",
+    "@editorjs/table": "^2.2.3",
+    "editorjs-drag-drop": "^1.1.16",
+    "editorjs-toggle-block": "^0.3.16",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.53.0",
     "clsx": "^2.1.1",

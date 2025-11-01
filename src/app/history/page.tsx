@@ -10,6 +10,8 @@ import { RetrospectiveEntry, KPTContent, PMIContent, FreeContent } from '@/types
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Calendar, Search, FileText } from 'lucide-react';
+import { FreeContentViewer } from '@/components/retrospective/FreeContentViewer';
+import { extractPlainTextFromFreeContent, normalizeFreeContent } from '@/lib/utils';
 
 export default function HistoryPage() {
   return (
@@ -85,7 +87,7 @@ function HistoryContent() {
         }
 
         const freeContent = content as FreeContent;
-        return freeContent.text.toLowerCase().includes(searchString);
+        return extractPlainTextFromFreeContent(freeContent).toLowerCase().includes(searchString);
       });
     }
 
@@ -165,9 +167,7 @@ function HistoryContent() {
   const renderFreeContent = (content: FreeContent) => (
     <div>
       <h4 className="font-semibold text-amber-700 mb-2">자유 작성</h4>
-      <p className="text-sm leading-relaxed whitespace-pre-line bg-amber-50 border-l-4 border-amber-500 p-3 rounded">
-        {content.text || '작성된 내용이 없습니다.'}
-      </p>
+      <FreeContentViewer content={normalizeFreeContent(content)} />
     </div>
   );
 

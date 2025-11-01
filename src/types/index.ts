@@ -19,8 +19,16 @@ export interface PMIContent {
   interesting: string[];
 }
 
+export interface FreeBlock {
+  id?: string;
+  type: string;
+  data: Record<string, unknown>;
+}
+
 export interface FreeContent {
-  text: string;
+  time?: number;
+  version?: string;
+  blocks: FreeBlock[];
 }
 
 export interface WeeklyReport {
