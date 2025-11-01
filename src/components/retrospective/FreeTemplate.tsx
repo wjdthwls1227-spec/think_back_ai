@@ -26,12 +26,7 @@ export function FreeTemplate({ initialData, onSave, saving = false }: FreeTempla
     if (!normalized.blocks.length) {
       return {
         ...normalized,
-        blocks: [
-          {
-            type: 'paragraph',
-            data: { text: '' },
-          },
-        ],
+        blocks: [],
       };
     }
 
