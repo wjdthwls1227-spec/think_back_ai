@@ -49,7 +49,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 
 #### retrospective_entries
 - 회고 항목 저장
-- JSON 형태로 KPT/PMI 내용 저장
+- JSON 형태로 KPT/PMI/자유 작성 내용을 저장
 - 사용자별, 날짜별, 타입별 유니크 제약
 - RLS 정책: 사용자는 자신의 회고만 CRUD 가능
 

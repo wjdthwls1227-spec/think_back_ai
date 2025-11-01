@@ -1,8 +1,8 @@
 export interface RetrospectiveEntry {
   id: string;
   date: string;
-  type: 'KPT' | 'PMI';
-  content: KPTContent | PMIContent;
+  type: 'KPT' | 'PMI' | 'FREE';
+  content: KPTContent | PMIContent | FreeContent;
   createdAt: string;
   updatedAt: string;
 }
@@ -17,6 +17,10 @@ export interface PMIContent {
   plus: string[];
   minus: string[];
   interesting: string[];
+}
+
+export interface FreeContent {
+  text: string;
 }
 
 export interface WeeklyReport {

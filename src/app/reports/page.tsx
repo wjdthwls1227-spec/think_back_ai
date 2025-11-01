@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { formatDate, getWeekRange } from '@/lib/utils';
-import { RetrospectiveEntry, WeeklyReport, KPTContent, PMIContent } from '@/types';
+import { RetrospectiveEntry, WeeklyReport, KPTContent, PMIContent, FreeContent } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Calendar, TrendingUp, Lightbulb, Target, FileText } from 'lucide-react';
@@ -96,6 +96,7 @@ function ReportsContent() {
   const generateAIAnalysis = (entries: RetrospectiveEntry[]) => {
     const kptEntries = entries.filter(e => e.type === 'KPT');
     const pmiEntries = entries.filter(e => e.type === 'PMI');
+    const freeEntries = entries.filter(e => e.type === 'FREE');
     
     const allKeeps: string[] = [];
     const allProblems: string[] = [];
@@ -103,6 +104,7 @@ function ReportsContent() {
     const allPlus: string[] = [];
     const allMinus: string[] = [];
     const allInteresting: string[] = [];
+    const freeHighlights: string[] = [];
 
     kptEntries.forEach(entry => {
       const content = entry.content as KPTContent;
@@ -116,6 +118,13 @@ function ReportsContent() {
       allPlus.push(...content.plus);
       allMinus.push(...content.minus);
       allInteresting.push(...content.interesting);
+    });
+
+    freeEntries.forEach(entry => {
+      const content = entry.content as FreeContent;
+      if (content.text) {
+        freeHighlights.push(content.text);
+      }
     });
 
     const insights = [];
@@ -139,6 +148,10 @@ function ReportsContent() {
       recommendations.push('흥미로운 영역들을 더 깊이 탐구해보는 것을 고려해보세요.');
     }
 
+    if (freeHighlights.length > 0) {
+      insights.push('자유 작성 회고에서 감정과 생각이 풍부하게 기록되었습니다. 이를 기반으로 추가적인 인사이트를 도출해보세요.');
+    }
+
     if (insights.length === 0) {
       insights.push('이번 주 회고 데이터를 기반으로 한 분석 결과입니다.');
     }
@@ -147,7 +160,7 @@ function ReportsContent() {
       recommendations.push('꾸준한 회고 작성을 통해 더 정확한 분석과 추천을 제공할 수 있습니다.');
     }
 
-    const summary = `총 ${entries.length}개의 회고가 작성되었습니다. (KPT: ${kptEntries.length}개, PMI: ${pmiEntries.length}개)`;
+    const summary = `총 ${entries.length}개의 회고가 작성되었습니다. (KPT: ${kptEntries.length}개, PMI: ${pmiEntries.length}개, 자유 작성: ${freeEntries.length}개)`;
 
     return { summary, insights, recommendations };
   };
@@ -232,7 +245,7 @@ function ReportsContent() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                       <div className="text-center p-4 bg-blue-50 rounded-lg">
                         <div className="text-2xl font-bold text-blue-600">
                           {selectedReport.entries.length}
@@ -250,6 +263,12 @@ function ReportsContent() {
                           {selectedReport.entries.filter(e => e.type === 'PMI').length}
                         </div>
                         <div className="text-sm text-purple-800">PMI 회고</div>
+                      </div>
+                      <div className="text-center p-4 bg-amber-50 rounded-lg">
+                        <div className="text-2xl font-bold text-amber-600">
+                          {selectedReport.entries.filter(e => e.type === 'FREE').length}
+                        </div>
+                        <div className="text-sm text-amber-800">자유 작성</div>
                       </div>
                     </div>
                     <p className="text-gray-700">{selectedReport.aiAnalysis}</p>
@@ -315,9 +334,11 @@ function ReportsContent() {
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
                               entry.type === 'KPT' 
                                 ? 'bg-blue-100 text-blue-800' 
-                                : 'bg-purple-100 text-purple-800'
+                                : entry.type === 'PMI'
+                                  ? 'bg-purple-100 text-purple-800'
+                                  : 'bg-amber-100 text-amber-800'
                             }`}>
-                              {entry.type}
+                              {entry.type === 'FREE' ? '자유' : entry.type}
                             </span>
                           </div>
                         </div>

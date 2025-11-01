@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { KPTTemplate } from '@/components/retrospective/KPTTemplate';
 import { PMITemplate } from '@/components/retrospective/PMITemplate';
+import { FreeTemplate } from '@/components/retrospective/FreeTemplate';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { formatDate } from '@/lib/utils';
-import { KPTContent, PMIContent } from '@/types';
+import { KPTContent, PMIContent, FreeContent } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 
@@ -21,11 +22,11 @@ export default function RetrospectivePage() {
 
 function RetrospectiveContent() {
   const { user } = useAuth();
-  const [templateType, setTemplateType] = useState<'KPT' | 'PMI'>('KPT');
+  const [templateType, setTemplateType] = useState<'KPT' | 'PMI' | 'FREE'>('KPT');
   const [savedMessage, setSavedMessage] = useState<string>('');
   const [saving, setSaving] = useState(false);
 
-  const handleSave = async (content: KPTContent | PMIContent) => {
+  const handleSave = async (content: KPTContent | PMIContent | FreeContent) => {
     console.log('=== 회고 저장 시작 ===');
     console.log('User:', user);
     console.log('Content:', content);
@@ -114,6 +115,12 @@ function RetrospectiveContent() {
             >
               PMI 템플릿
             </Button>
+            <Button
+              variant={templateType === 'FREE' ? 'default' : 'outline'}
+              onClick={() => setTemplateType('FREE')}
+            >
+              자유 작성
+            </Button>
           </div>
           <div className="mt-4 text-sm text-gray-600">
             {templateType === 'KPT' && (
@@ -126,6 +133,11 @@ function RetrospectiveContent() {
                 <strong>PMI 템플릿:</strong> Plus (좋았던 것), Minus (아쉬웠던 것), Interesting (흥미로웠던 것)으로 구성된 회고 방식입니다.
               </p>
             )}
+            {templateType === 'FREE' && (
+              <p>
+                <strong>자유 작성:</strong> 형식에 구애받지 않고 오늘의 경험과 생각을 자유롭게 기록합니다.
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -136,6 +148,10 @@ function RetrospectiveContent() {
 
       {templateType === 'PMI' && (
         <PMITemplate onSave={handleSave} saving={saving} />
+      )}
+
+      {templateType === 'FREE' && (
+        <FreeTemplate onSave={handleSave} saving={saving} />
       )}
     </div>
   );

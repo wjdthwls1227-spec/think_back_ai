@@ -42,7 +42,7 @@ export type Database = {
           id: string;
           user_id: string;
           date: string;
-          type: 'KPT' | 'PMI';
+          type: 'KPT' | 'PMI' | 'FREE';
           content: Record<string, unknown>;
           created_at: string;
           updated_at: string;
@@ -51,7 +51,7 @@ export type Database = {
           id?: string;
           user_id: string;
           date: string;
-          type: 'KPT' | 'PMI';
+          type: 'KPT' | 'PMI' | 'FREE';
           content: Record<string, unknown>;
           created_at?: string;
           updated_at?: string;
@@ -60,7 +60,7 @@ export type Database = {
           id?: string;
           user_id?: string;
           date?: string;
-          type?: 'KPT' | 'PMI';
+          type?: 'KPT' | 'PMI' | 'FREE';
           content?: Record<string, unknown>;
           created_at?: string;
           updated_at?: string;

@@ -25,7 +25,7 @@ CREATE TABLE public.retrospective_entries (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
     date DATE NOT NULL,
-    type TEXT NOT NULL CHECK (type IN ('KPT', 'PMI')),
+    type TEXT NOT NULL CHECK (type IN ('KPT', 'PMI', 'FREE')),
     content JSONB NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

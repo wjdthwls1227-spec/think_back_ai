@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { formatDate } from '@/lib/utils';
-import { RetrospectiveEntry, KPTContent, PMIContent } from '@/types';
+import { RetrospectiveEntry, KPTContent, PMIContent, FreeContent } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Calendar, Search, FileText } from 'lucide-react';
@@ -24,7 +24,7 @@ function HistoryContent() {
   const [entries, setEntries] = useState<RetrospectiveEntry[]>([]);
   const [filteredEntries, setFilteredEntries] = useState<RetrospectiveEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'KPT' | 'PMI'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'KPT' | 'PMI' | 'FREE'>('all');
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -73,7 +73,9 @@ function HistoryContent() {
             kptContent.problem.some(item => item.toLowerCase().includes(searchString)) ||
             kptContent.try.some(item => item.toLowerCase().includes(searchString))
           );
-        } else {
+        }
+
+        if (entry.type === 'PMI') {
           const pmiContent = content as PMIContent;
           return (
             pmiContent.plus.some(item => item.toLowerCase().includes(searchString)) ||
@@ -81,6 +83,9 @@ function HistoryContent() {
             pmiContent.interesting.some(item => item.toLowerCase().includes(searchString))
           );
         }
+
+        const freeContent = content as FreeContent;
+        return freeContent.text.toLowerCase().includes(searchString);
       });
     }
 
@@ -157,6 +162,15 @@ function HistoryContent() {
     </div>
   );
 
+  const renderFreeContent = (content: FreeContent) => (
+    <div>
+      <h4 className="font-semibold text-amber-700 mb-2">자유 작성</h4>
+      <p className="text-sm leading-relaxed whitespace-pre-line bg-amber-50 border-l-4 border-amber-500 p-3 rounded">
+        {content.text || '작성된 내용이 없습니다.'}
+      </p>
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -209,6 +223,13 @@ function HistoryContent() {
           >
             PMI
           </Button>
+          <Button
+            variant={filterType === 'FREE' ? 'default' : 'outline'}
+            onClick={() => setFilterType('FREE')}
+            size="sm"
+          >
+            자유 작성
+          </Button>
         </div>
       </div>
 
@@ -241,12 +262,16 @@ function HistoryContent() {
                   <CardTitle className="flex items-center space-x-2">
                     <Calendar className="w-5 h-5 text-gray-500" />
                     <span>{formatDate(entry.date)}</span>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      entry.type === 'KPT' 
-                        ? 'bg-blue-100 text-blue-800' 
-                        : 'bg-purple-100 text-purple-800'
-                    }`}>
-                      {entry.type}
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${
+                        entry.type === 'KPT'
+                          ? 'bg-blue-100 text-blue-800'
+                          : entry.type === 'PMI'
+                            ? 'bg-purple-100 text-purple-800'
+                            : 'bg-amber-100 text-amber-800'
+                      }`}
+                    >
+                      {entry.type === 'FREE' ? '자유' : entry.type}
                     </span>
                   </CardTitle>
                   <Button
@@ -262,10 +287,9 @@ function HistoryContent() {
               </CardHeader>
               {expandedEntry === entry.id && (
                 <CardContent>
-                  {entry.type === 'KPT' 
-                    ? renderKPTContent(entry.content as KPTContent)
-                    : renderPMIContent(entry.content as PMIContent)
-                  }
+                  {entry.type === 'KPT' && renderKPTContent(entry.content as KPTContent)}
+                  {entry.type === 'PMI' && renderPMIContent(entry.content as PMIContent)}
+                  {entry.type === 'FREE' && renderFreeContent(entry.content as FreeContent)}
                 </CardContent>
               )}
             </Card>
