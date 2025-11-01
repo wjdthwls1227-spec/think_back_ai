@@ -53,21 +53,20 @@ function RetrospectiveContent() {
       
       console.log('Retrospective Data:', retrospectiveData);
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('retrospective_entries')
         .upsert(retrospectiveData, {
-          onConflict: 'user_id,date,type'
-        })
-        .select();
+          onConflict: 'user_id,date,type',
+          returning: 'minimal',
+        });
 
-      console.log('Supabase Response Data:', data);
       console.log('Supabase Response Error:', error);
 
       if (error) {
         console.error('Supabase Error Details:', error);
         setSavedMessage(`저장 중 오류가 발생했습니다: ${error.message}`);
       } else {
-        console.log('저장 성공!', data);
+        console.log('저장 성공!');
         setSavedMessage('회고가 성공적으로 저장되었습니다!');
       }
     } catch (error) {
