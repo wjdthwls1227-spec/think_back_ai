@@ -114,21 +114,6 @@ export default function LoginPage() {
             <EmailLoginForm />
           </div>
         )}
-
-        {!emailLoginAvailable && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-center text-lg">카카오 로그인으로 이용해 주세요</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 text-center">
-              <p className="text-sm text-gray-600">
-                이메일 로그인 기능은 보안 강화를 위해 준비 중입니다. 카카오 계정으로 먼저 서비스를 이용하실 수 있어요.
-              </p>
-              <LoginButton className="w-full" />
-            </CardContent>
-          </Card>
-        )}
-
         <div className="pt-2">
           <Card>
             <CardHeader>
