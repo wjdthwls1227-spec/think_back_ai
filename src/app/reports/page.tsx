@@ -20,6 +20,36 @@ export default function ReportsPage() {
 
 function ReportsContent() {
   const { user } = useAuth();
+  const featureUnderConstruction = true;
+
+  if (featureUnderConstruction) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <Card>
+          <CardHeader className="text-center">
+            <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <CardTitle className="text-2xl text-gray-900">주간 리포트</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 text-center text-gray-600">
+            <p className="text-lg font-semibold text-gray-800">서비스 개설 준비 중입니다.</p>
+            <p>
+              보다 정교한 AI 분석 리포트를 제공하기 위해 개선 작업을 진행하고 있어요.
+              빠르게 준비해서 다시 안내드릴게요.
+            </p>
+            <p>
+              회고 작성은 계속 이용하실 수 있으며, 저장된 내용은 향후 리포트 생성에 그대로 활용됩니다.
+            </p>
+            <div className="pt-4">
+              <Button onClick={() => window.location.href = '/retrospective'}>
+                회고 작성하러가기
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   const [entries, setEntries] = useState<RetrospectiveEntry[]>([]);
   const [weeklyReports, setWeeklyReports] = useState<WeeklyReport[]>([]);
   const [selectedWeek, setSelectedWeek] = useState<string>('');
