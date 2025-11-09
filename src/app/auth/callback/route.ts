@@ -6,15 +6,31 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code');
   const next = searchParams.get('next') ?? '/';
 
+  const errorParam = searchParams.get('error');
+  const errorDescription = searchParams.get('error_description');
+
+  console.log('=== OAuth Callback Debug ===');
+  console.log('Origin:', origin);
+  console.log('Full URL:', request.url);
+  console.log('Code:', code ? 'Present' : 'Missing');
+  console.log('Error params:', errorParam, errorDescription);
+
+  // 에러가 있으면 에러 페이지로 리디렉션
+  if (errorParam) {
+    console.error('❌ OAuth error received:', errorParam, errorDescription);
+    return NextResponse.redirect(`${origin}/auth/auth-code-error?error=${errorParam}&description=${encodeURIComponent(errorDescription || '')}`);
+  }
+
   // OAuth 코드 기반 인증 (카카오 등)
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     
     if (!error) {
+      console.log('✅ Code exchange successful');
       return NextResponse.redirect(`${origin}${next}`);
     }
-    console.error('OAuth code exchange error:', error);
+    console.error('❌ OAuth code exchange error:', error);
     return NextResponse.redirect(`${origin}/auth/auth-code-error`);
   }
 

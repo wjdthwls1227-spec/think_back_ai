@@ -34,13 +34,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         // 관리자 권한 체크
         if (session?.user) {
-          const { data: profile } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', session.user.id)
             .single();
           
-          setIsAdmin(profile?.role === 'admin' || profile?.role === 'owner');
+          if (profileError) {
+            console.error('Error fetching profile:', profileError);
+          } else {
+            setIsAdmin(profile?.role === 'admin' || profile?.role === 'owner');
+          }
         }
       }
       setLoading(false);
@@ -60,13 +64,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
           
           // 관리자 권한 체크
-          const { data: profile } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', session.user.id)
             .single();
           
-          setIsAdmin(profile?.role === 'admin' || profile?.role === 'owner');
+          if (profileError) {
+            console.error('Error fetching profile:', profileError);
+          } else {
+            setIsAdmin(profile?.role === 'admin' || profile?.role === 'owner');
+          }
         } else {
           setIsAdmin(false);
         }
