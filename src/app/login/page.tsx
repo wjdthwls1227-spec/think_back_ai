@@ -8,10 +8,14 @@ import { EmailLoginForm } from '@/components/auth/EmailLoginForm';
 import { useAuth } from '@/context/AuthContext';
 import { FileText, History, BarChart3 } from 'lucide-react';
 
+const emailLoginAvailable = false;
+
 export default function LoginPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [loginMethod, setLoginMethod] = useState<'choice' | 'email' | 'kakao'>('choice');
+  const [loginMethod, setLoginMethod] = useState<'choice' | 'email' | 'kakao'>(
+    emailLoginAvailable ? 'choice' : 'kakao'
+  );
 
   useEffect(() => {
     if (!loading && user) {
@@ -42,13 +46,13 @@ export default function LoginPage() {
             회고리즘
           </h1>
           <p className="text-gray-600">
-            실행력 향상을 위한 AI 기반 회고 분석 플랫폼
+            성장하는 사람들의 회고 알고리즘 플랫폼
           </p>
         </div>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        {loginMethod === 'choice' && (
+        {loginMethod === 'choice' && emailLoginAvailable && (
           <Card>
             <CardHeader>
               <CardTitle className="text-center">로그인 방법 선택</CardTitle>
@@ -88,7 +92,7 @@ export default function LoginPage() {
           </Card>
         )}
 
-        {loginMethod === 'email' && (
+        {emailLoginAvailable && loginMethod === 'email' && (
           <div className="space-y-4">
             <button
               onClick={() => setLoginMethod('choice')}
@@ -98,6 +102,20 @@ export default function LoginPage() {
             </button>
             <EmailLoginForm />
           </div>
+        )}
+
+        {!emailLoginAvailable && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-center text-lg">카카오 로그인으로 이용해 주세요</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-center">
+              <p className="text-sm text-gray-600">
+                이메일 로그인 기능은 보안 강화를 위해 준비 중입니다. 카카오 계정으로 먼저 서비스를 이용하실 수 있어요.
+              </p>
+              <LoginButton className="w-full" />
+            </CardContent>
+          </Card>
         )}
 
         <div className="mt-8">
