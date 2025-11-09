@@ -149,7 +149,12 @@ export default class TextColorTool {
 
   private applyColor(color: string) {
     if (this.savedSelection) {
-      this.api.selection.restore(this.savedSelection);
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(this.savedSelection);
+      }
+      this.savedSelection = null;
     } else {
       this.api.selection.restore();
     }
