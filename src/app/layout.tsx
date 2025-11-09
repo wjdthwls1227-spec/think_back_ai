@@ -31,6 +31,10 @@ export default function RootLayout({
           name="naver-site-verification"
           content="1699e32a9f0eb7a41b09255e0f81fc131cebd2a5"
         />
+        <meta
+          name="google-adsense-account"
+          content="ca-pub-8742973589696620"
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
