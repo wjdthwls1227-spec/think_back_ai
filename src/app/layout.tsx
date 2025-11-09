@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "회고리즘 - AI 기반 회고 분석 플랫폼",
-  description: "실행력 향상을 위한 AI 기반 회고 분석 자동화 플랫폼",
+  description: "성장하는 사람들의 회고 알고리즘 플랫폼",
 };
 
 export default function RootLayout({
