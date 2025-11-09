@@ -40,7 +40,7 @@ export default function HomePage() {
           회고리즘
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-          실행력 향상을 위한 AI 기반 회고 분석 자동화 플랫폼
+          성장하는 사람들의 회고 알고리즘 플랫폼
         </p>
         <div className="flex justify-center space-x-4">
           <Link href="/retrospective">
