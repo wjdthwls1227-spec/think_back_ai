@@ -58,7 +58,6 @@ function RetrospectiveContent() {
         .from('retrospective_entries')
         .upsert(retrospectiveData, {
           onConflict: 'user_id,date,type',
-          returning: 'minimal',
         });
 
       console.log('Supabase Response Error:', error);
