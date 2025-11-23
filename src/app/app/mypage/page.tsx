@@ -63,8 +63,13 @@ function MyPageContent() {
 
         if (contentsError) {
           console.error('User contents fetch error:', contentsError);
-        } else {
-          setUserContents(contentsData || []);
+        } else if (contentsData) {
+          // Supabase join 결과에서 contents가 배열일 수 있으므로 첫 번째 요소 사용
+          const processedContents = contentsData.map((uc: any) => ({
+            id: uc.id,
+            contents: Array.isArray(uc.contents) ? uc.contents[0] : uc.contents,
+          })).filter((uc: any) => uc.contents); // contents가 있는 것만 필터링
+          setUserContents(processedContents);
           setContentCount(count || 0);
         }
 
