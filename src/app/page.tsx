@@ -16,12 +16,12 @@ export default async function HomePage() {
       <section className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-16 sm:py-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900 dark:text-white mb-6 leading-tight">
-            3분 회고,<br className="sm:hidden" />
-            <span className="hidden sm:inline"> </span>AI가 정리해줍니다
+            하루 3분,<br className="sm:hidden" />
+            <span className="hidden sm:inline"> </span>회고로 성장하세요
           </h1>
           <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-            매일의 경험을 성장의 자산으로 바꾸는 회고 플랫폼입니다.<br className="hidden sm:block" />
-            <span className="hidden sm:inline"> </span>AI가 감정과 패턴을 분석해 다음 행동까지 제안합니다.
+            매일의 경험을 기록하고, AI가 감정과 패턴을 분석해<br className="hidden sm:block" />
+            <span className="hidden sm:inline"> </span>다음 행동까지 제안해드립니다.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-16">
             {user ? (
@@ -53,8 +53,7 @@ export default async function HomePage() {
                   <h3 className="font-semibold text-base sm:text-lg text-gray-900 dark:text-gray-100">3분 회고</h3>
                 </div>
                 <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
-                  오늘 하루를 간단히 기록하세요.<br className="hidden sm:block" />
-                  형식은 회고리즘이 잡아줍니다.
+                  오늘 있었던 일, 감정, 에너지를 짧게 남기면 됩니다. 형식은 회고리즘이 대신 잡아줍니다.
                 </p>
               </CardContent>
             </Card>
@@ -65,8 +64,7 @@ export default async function HomePage() {
                   <h3 className="font-semibold text-base sm:text-lg text-gray-900 dark:text-gray-100">AI 분석</h3>
                 </div>
                 <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
-                  감정과 패턴을 자동으로 분석해<br className="hidden sm:block" />
-                  핵심 인사이트를 제공합니다.
+                  여러 날의 회고를 묶어 감정·지출·행동 패턴을 요약하고 핵심 인사이트를 제공합니다.
                 </p>
               </CardContent>
             </Card>
@@ -77,8 +75,7 @@ export default async function HomePage() {
                   <h3 className="font-semibold text-base sm:text-lg text-gray-900 dark:text-gray-100">성장 제안</h3>
                 </div>
                 <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
-                  다음 주에 집중할 점을<br className="hidden sm:block" />
-                  구체적으로 제안합니다.
+                  어디서 에너지가 새는지, 무엇을 줄이고 늘려야 할지 구체적인 제안을 제공합니다.
                 </p>
               </CardContent>
             </Card>
