@@ -33,7 +33,7 @@ export default function PricingPage() {
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
           당신의 성장을 위한 플랜을 선택하세요.<br />
-          Free 플랜으로 시작하고, 필요할 때 AI Pro로 업그레이드하세요.
+          Free 플랜으로 시작하세요. AI Pro 플랜은 출시 예정입니다.
         </p>
       </div>
 
@@ -84,9 +84,9 @@ export default function PricingPage() {
         </Card>
 
         {/* AI Pro 플랜 */}
-        <Card className="border-2 border-blue-500 dark:border-blue-400 relative">
-          <div className="absolute top-0 right-0 bg-blue-600 dark:bg-blue-500 text-white px-3 py-1 rounded-bl-lg text-sm font-semibold">
-            추천
+        <Card className="border-2 border-blue-500 dark:border-blue-400 relative opacity-75">
+          <div className="absolute top-0 right-0 bg-orange-500 dark:bg-orange-600 text-white px-3 py-1 rounded-bl-lg text-sm font-semibold">
+            출시 예정
           </div>
           <CardHeader>
             <div className="flex items-center mb-2">
@@ -124,10 +124,10 @@ export default function PricingPage() {
               </li>
             </ul>
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-              onClick={() => handleSelectPlan('pro')}
+              className="w-full bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
+              disabled
             >
-              {user ? '플랜 적용하기' : '로그인 후 시작하기'}
+              출시 예정
             </Button>
           </CardContent>
         </Card>
@@ -156,7 +156,7 @@ export default function PricingPage() {
                 AI Pro 플랜은 언제 출시되나요?
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                AI Pro 플랜은 곧 출시 예정입니다. 출시 알림을 받으시려면 로그인 후 대시보드를 확인해주세요.
+                AI Pro 플랜은 현재 출시 예정입니다. 정확한 출시 일정은 추후 공지될 예정입니다. 출시 알림을 받으시려면 로그인 후 대시보드를 확인해주세요.
               </p>
             </CardContent>
           </Card>
