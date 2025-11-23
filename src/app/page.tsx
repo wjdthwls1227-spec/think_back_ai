@@ -245,6 +245,14 @@ export default async function HomePage() {
           <p className="text-base sm:text-lg text-gray-400 mb-3 sm:mb-4">
             © {new Date().getFullYear()} ThinkBack AI · 회고리즘
           </p>
+          <div className="mb-3 sm:mb-4">
+            <a
+              href="mailto:wjdthwls12@naver.com"
+              className="text-base sm:text-lg text-gray-400 hover:text-white transition-colors underline"
+            >
+              문의하기: wjdthwls12@naver.com
+            </a>
+          </div>
           <p className="text-sm sm:text-base text-gray-500 leading-relaxed">
             제휴 링크 안내: 일부 링크는 쿠팡파트너스 등 제휴 프로그램을 통해 수수료를 받을 수 있습니다.
           </p>
