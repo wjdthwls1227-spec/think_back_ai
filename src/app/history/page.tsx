@@ -16,7 +16,6 @@ import { PMITemplate } from '@/components/retrospective/PMITemplate';
 import { FourLTemplate } from '@/components/retrospective/FourLTemplate';
 import { FreeContentViewer } from '@/components/retrospective/FreeContentViewer';
 import { extractPlainTextFromFreeContent, normalizeFreeContent } from '@/lib/utils';
-import { KPTContent, PMIContent, FreeContent, FourLContent } from '@/types';
 
 interface Journal {
   id: string;
