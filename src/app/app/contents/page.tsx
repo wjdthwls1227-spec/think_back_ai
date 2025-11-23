@@ -62,8 +62,9 @@ export default async function MyContentsPage() {
 
       {userContents && userContents.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {userContents.map((uc: UserContent & { contents: Content }) => {
-            const content = uc.contents;
+          {userContents.map((uc: any) => {
+            // Supabase join 결과 타입 처리
+            const content = Array.isArray(uc.contents) ? uc.contents[0] : uc.contents;
             if (!content) return null;
 
             const Icon = typeIcons[content.type as keyof typeof typeIcons];
