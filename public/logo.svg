@@ -1,0 +1,5 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#F8F5ED"/>
+  <!-- 회고리즘 text with proper Korean font -->
+  <text x="100" y="120" font-family="'Malgun Gothic', '맑은 고딕', sans-serif" font-size="60" font-weight="bold" fill="#2C4A45" text-anchor="middle">회고리즘</text>
+</svg>
