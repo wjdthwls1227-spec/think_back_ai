@@ -39,9 +39,10 @@ export function EmailPasswordForm() {
       // 로그인 성공 시 리다이렉트는 AuthContext나 페이지에서 처리
     } catch (err: unknown) {
       console.error('Login error:', err);
-      if (err.message === 'EMAIL_NOT_CONFIRMED' || err.message?.includes('Email not confirmed') || err.message?.includes('email_not_confirmed')) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      if (errorMessage === 'EMAIL_NOT_CONFIRMED' || errorMessage.includes('Email not confirmed') || errorMessage.includes('email_not_confirmed')) {
         setError('이메일 인증이 필요합니다. 가입하신 이메일을 확인해주세요.');
-      } else if (err.message?.includes('Invalid login credentials')) {
+      } else if (errorMessage.includes('Invalid login credentials')) {
         setError('이메일 또는 비밀번호가 올바르지 않습니다.');
       } else {
         setError('로그인에 실패했습니다. 다시 시도해주세요.');

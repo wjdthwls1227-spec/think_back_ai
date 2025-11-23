@@ -1211,65 +1211,7 @@ function ReportsContent() {
                     <p className="text-gray-700 dark:text-gray-300">{weeklyAnalysis.summary}</p>
                   </div>
                   
-                  {weeklyAnalysis.keywords && weeklyAnalysis.keywords.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2">키워드</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {weeklyAnalysis.keywords.map((keyword: string, i: number) => (
-                          <span key={i} className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-sm">
-                            {keyword}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
 
-                  {weeklyAnalysis.patterns && weeklyAnalysis.patterns.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
-                        <TrendingUp className="w-4 h-4 mr-2" />
-                        패턴
-                      </h3>
-                      <ul className="space-y-2">
-                        {weeklyAnalysis.patterns.map((pattern: string, i: number) => (
-                          <li key={i} className="flex items-start">
-                            <Lightbulb className="w-4 h-4 text-yellow-500 mr-2 mt-0.5" />
-                            <span className="text-gray-700 dark:text-gray-300">{pattern}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {weeklyAnalysis.improvements && weeklyAnalysis.improvements.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
-                        <Target className="w-4 h-4 mr-2" />
-                        개선점
-                      </h3>
-                      <ul className="space-y-2">
-                        {weeklyAnalysis.improvements.map((improvement: string, i: number) => (
-                          <li key={i} className="flex items-start">
-                            <span className="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mr-2 mt-0.5">
-                              <span className="text-green-600 dark:text-green-400 text-xs font-semibold">{i + 1}</span>
-                            </span>
-                            <span className="text-gray-700 dark:text-gray-300">{improvement}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {weeklyAnalysis.nextWeekGoals && weeklyAnalysis.nextWeekGoals.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2">다음 주 목표</h3>
-                      <ul className="space-y-2">
-                        {weeklyAnalysis.nextWeekGoals.map((goal: string, i: number) => (
-                          <li key={i} className="text-gray-700 dark:text-gray-300">• {goal}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             </div>
@@ -1350,40 +1292,6 @@ function ReportsContent() {
                     <p className="text-gray-700 dark:text-gray-300">{monthlyAnalysis.summary}</p>
                   </div>
                   
-                  {monthlyAnalysis.keywords && monthlyAnalysis.keywords.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2">키워드</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {monthlyAnalysis.keywords.map((keyword: string, i: number) => (
-                          <span key={i} className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded text-sm">
-                            {keyword}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {monthlyAnalysis.longTermPatterns && monthlyAnalysis.longTermPatterns.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2">장기 패턴</h3>
-                      <ul className="space-y-2">
-                        {monthlyAnalysis.longTermPatterns.map((pattern: string, i: number) => (
-                          <li key={i} className="text-gray-700 dark:text-gray-300">• {pattern}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {monthlyAnalysis.achievements && monthlyAnalysis.achievements.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2">주요 성과</h3>
-                      <ul className="space-y-2">
-                        {monthlyAnalysis.achievements.map((achievement: string, i: number) => (
-                          <li key={i} className="text-gray-700 dark:text-gray-300">• {achievement}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             </div>

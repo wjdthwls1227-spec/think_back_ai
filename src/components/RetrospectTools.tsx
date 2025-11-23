@@ -6,16 +6,6 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 import type { RetrospectTool } from '@/types';
 
-export type RetrospectTool = {
-  id: string;
-  category: '노트' | '필기구' | '도서' | '디지털' | '기타';
-  name: string;
-  description: string;
-  benefit: string;
-  imageUrl: string;
-  linkUrl: string;
-};
-
 const categories: (RetrospectTool['category'] | '전체')[] = ['전체', '노트', '필기구', '도서', '디지털', '기타'];
 
 export function RetrospectTools() {
@@ -35,17 +25,7 @@ export function RetrospectTools() {
 
         if (error) throw error;
 
-        const formattedTools: RetrospectTool[] = (data || []).map((tool: RetrospectTool) => ({
-          id: tool.id,
-          category: tool.category,
-          name: tool.name,
-          description: tool.description || '',
-          benefit: tool.benefit || '',
-          imageUrl: tool.image_url || '/placeholder-tool.jpg',
-          linkUrl: tool.link_url || '#',
-        }));
-
-        setTools(formattedTools);
+        setTools((data || []) as RetrospectTool[]);
       } catch (error: unknown) {
         console.error('Error loading tools:', error);
         // 테이블이 없으면 빈 배열로 설정 (에러 메시지는 표시하지 않음)

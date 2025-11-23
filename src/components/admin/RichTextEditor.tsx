@@ -24,8 +24,9 @@ function editorDataToHTML(data: FreeContent): string {
         return `<p class="mb-4 leading-relaxed">${blockData?.text || ''}</p>`;
       
       case 'header':
-        const level = Math.min(Math.max(blockData?.level || 2, 1), 6);
-        return `<h${level} class="font-bold mb-4 mt-6">${blockData?.text || ''}</h${level}>`;
+        const headerData = blockData as { level?: number; text?: string } | undefined;
+        const level = Math.min(Math.max(headerData?.level || 2, 1), 6);
+        return `<h${level} class="font-bold mb-4 mt-6">${headerData?.text || ''}</h${level}>`;
       
       case 'list':
         const items = (blockData?.items as string[]) || [];

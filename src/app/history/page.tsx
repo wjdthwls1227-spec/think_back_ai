@@ -93,7 +93,7 @@ function HistoryContent() {
         }
         
         // content 타입에 따라 검색
-        if (content.keep || content.problem || content.try) {
+        if ('keep' in content) {
           // KPT
           const kpt = content as KPTContent;
           return (
@@ -103,7 +103,7 @@ function HistoryContent() {
           );
         }
         
-        if (content.plus || content.minus || content.interesting) {
+        if ('plus' in content) {
           // PMI
           const pmi = content as PMIContent;
           return (
@@ -113,7 +113,7 @@ function HistoryContent() {
           );
         }
         
-        if (content.liked || content.learned || content.lacked || content.longedFor) {
+        if ('liked' in content) {
           // 4L
           const fourL = content as FourLContent;
           return (
@@ -173,9 +173,9 @@ function HistoryContent() {
   };
 
   const getContentType = (content: KPTContent | PMIContent | FreeContent | FourLContent): 'KPT' | 'PMI' | 'FREE' | '4L' => {
-    if (content.keep || content.problem || content.try) return 'KPT';
-    if (content.plus || content.minus || content.interesting) return 'PMI';
-    if (content.liked || content.learned || content.lacked || content.longedFor) return '4L';
+    if ('keep' in content) return 'KPT';
+    if ('plus' in content) return 'PMI';
+    if ('liked' in content) return '4L';
     return 'FREE';
   };
 
@@ -595,8 +595,8 @@ function EditJournalContent({
 }
 
 function getContentType(content: KPTContent | PMIContent | FreeContent | FourLContent): 'KPT' | 'PMI' | 'FREE' | '4L' {
-  if (content.keep || content.problem || content.try) return 'KPT';
-  if (content.plus || content.minus || content.interesting) return 'PMI';
-  if (content.liked || content.learned || content.lacked || content.longedFor) return '4L';
+  if ('keep' in content) return 'KPT';
+  if ('plus' in content) return 'PMI';
+  if ('liked' in content) return '4L';
   return 'FREE';
 }
