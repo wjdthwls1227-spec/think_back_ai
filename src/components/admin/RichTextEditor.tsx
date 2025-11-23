@@ -51,8 +51,9 @@ function editorDataToHTML(data: FreeContent): string {
         return `<table><tbody>${rows}</tbody></table>`;
       
       case 'image':
-        const url = blockData?.file?.url || blockData?.url || '';
-        const caption = blockData?.caption || '';
+        const imageData = blockData as { file?: { url?: string }; url?: string; caption?: string };
+        const url = imageData?.file?.url || imageData?.url || '';
+        const caption = imageData?.caption || '';
         return `<figure><img src="${url}" alt="${caption}" class="w-full h-auto rounded-lg my-4" /><figcaption>${caption}</figcaption></figure>`;
       
       case 'toggle':
