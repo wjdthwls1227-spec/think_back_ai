@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { LogoutButton } from '@/components/auth/LogoutButton';
 
-export default function MyPage() {
+function MyPageContent() {
   const { user, loading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -443,6 +443,14 @@ export default function MyPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function MyPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <MyPageContent />
+    </Suspense>
   );
 }
 
