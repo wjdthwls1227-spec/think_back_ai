@@ -43,14 +43,14 @@ function MyPageContent() {
         // 프로필 정보 조회
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('display_name, email, ai_plan_until, role, created_at')
+          .select('id, email, name, display_name, avatar_url, role, ai_plan_until, signup_path, created_at, updated_at')
           .eq('id', user.id)
           .single();
 
         if (profileError) {
           console.error('Profile fetch error:', profileError);
-        } else {
-          setProfile(profileData);
+        } else if (profileData) {
+          setProfile(profileData as Profile);
         }
 
         // 내 콘텐츠 조회
