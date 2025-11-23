@@ -198,7 +198,7 @@ function ReportsContent() {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
-      if (!token) {
+      if (!token || !user) {
         alert('로그인이 필요합니다.');
         setLoadingDaily(false);
         return;
@@ -430,8 +430,8 @@ function ReportsContent() {
   };
 
   const saveDailyReport = async (analysisResult: any, date: string) => {
-    if (!analysisResult || !date) {
-      console.warn('saveDailyReport: Missing parameters', { analysisResult: !!analysisResult, date });
+    if (!analysisResult || !date || !user) {
+      console.warn('saveDailyReport: Missing parameters', { analysisResult: !!analysisResult, date, user: !!user });
       return;
     }
     
@@ -517,7 +517,7 @@ function ReportsContent() {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
-      if (!token) {
+      if (!token || !user) {
         alert('로그인이 필요합니다.');
         setLoadingWeekly(false);
         return;
@@ -627,8 +627,8 @@ function ReportsContent() {
   };
 
   const saveWeeklyReport = async (analysisResult: any, weekStart: string) => {
-    if (!analysisResult || !weekStart) {
-      console.warn('saveWeeklyReport: Missing parameters', { analysisResult: !!analysisResult, weekStart });
+    if (!analysisResult || !weekStart || !user) {
+      console.warn('saveWeeklyReport: Missing parameters', { analysisResult: !!analysisResult, weekStart, user: !!user });
       return;
     }
     
@@ -713,7 +713,7 @@ function ReportsContent() {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
-      if (!token) {
+      if (!token || !user) {
         alert('로그인이 필요합니다.');
         setLoadingMonthly(false);
         return;
@@ -818,8 +818,8 @@ function ReportsContent() {
   };
 
   const saveMonthlyReport = async (analysisResult: any) => {
-    if (!analysisResult) {
-      console.warn('saveMonthlyReport: Missing analysisResult');
+    if (!analysisResult || !user) {
+      console.warn('saveMonthlyReport: Missing parameters', { analysisResult: !!analysisResult, user: !!user });
       return;
     }
     
