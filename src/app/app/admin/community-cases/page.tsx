@@ -110,6 +110,7 @@ export default function AdminCommunityCasesPage() {
       body: '',
       category: '',
       is_featured: false,
+      image_url: '',
     });
     setShowForm(true);
     setTimeout(() => {
