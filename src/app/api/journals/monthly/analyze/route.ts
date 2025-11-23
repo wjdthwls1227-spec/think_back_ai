@@ -3,7 +3,6 @@ import { createServerClient } from '@supabase/ssr';
 import OpenAI from 'openai';
 import { cookies } from 'next/headers';
 import type { Database } from '@/lib/supabase';
-import type { Database } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
