@@ -88,15 +88,15 @@ function MyPageContent() {
         // 최근 회고 조회 (최근 3개)
         const { data: journalsData, error: recentJournalsError } = await supabase
           .from('journals')
-          .select('id, date, type, title, created_at')
+          .select('id, user_id, type, date, title, content, created_at, updated_at')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(3);
 
         if (recentJournalsError) {
           console.error('Recent journals error:', recentJournalsError);
-        } else {
-          setRecentJournals(journalsData || []);
+        } else if (journalsData) {
+          setRecentJournals(journalsData as Journal[]);
         }
       } catch (error) {
         console.error('MyPage data loading error:', error);
