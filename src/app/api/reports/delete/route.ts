@@ -30,11 +30,13 @@ export async function POST(request: NextRequest) {
     // 서비스 롤 키가 있으면 사용 (RLS 우회)
     if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       console.log('Using service role key for report delete.');
-      supabase = createServerClient<Database>(
+      const { createClient } = await import('@supabase/supabase-js');
+      supabase = createClient<Database>(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!,
         {
           auth: {
+            autoRefreshToken: false,
             persistSession: false,
           },
         }
