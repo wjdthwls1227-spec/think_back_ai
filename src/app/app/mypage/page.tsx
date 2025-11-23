@@ -9,6 +9,7 @@ import { User, CreditCard, BookOpen, LogOut, Sparkles, FileText, Calendar, Trend
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { LogoutButton } from '@/components/auth/LogoutButton';
+import type { Profile, Content, Journal } from '@/types';
 
 function MyPageContent() {
   const { user, loading: authLoading } = useAuth();
