@@ -15,31 +15,31 @@ export default async function HomePage() {
       {/* Hero 섹션 */}
       <section className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-16 sm:py-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900 dark:text-white mb-6 leading-tight">
-            하루 3분,<br className="sm:hidden" />
-            <span className="hidden sm:inline"> </span>회고로 성장하세요
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+            성장하는 사람들의<br />
+            회고 알고리즘 플랫폼
           </h1>
-          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-            매일의 경험을 기록하고, AI가 감정과 패턴을 분석해<br className="hidden sm:block" />
-            <span className="hidden sm:inline"> </span>다음 행동까지 제안해드립니다.
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+            ThinkBack AI로 매일의 경험을 성장의 자산으로 바꾸세요.<br />
+            AI 기반 분석으로 더 깊은 인사이트를 얻을 수 있습니다.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-16">
             {user ? (
               <Link href="/app/journal">
                 <Button size="lg" className="w-full sm:w-auto px-8">
-                  회고 시작하기
+                  3분 만에 회고 시작하기
                 </Button>
               </Link>
             ) : (
               <Link href="/login?redirect=/app/journal">
                 <Button size="lg" className="w-full sm:w-auto px-8">
-                  무료로 시작하기
+                  3분 만에 회고 시작하기
                 </Button>
               </Link>
             )}
             <Link href="/contents">
               <Button variant="outline" size="lg" className="w-full sm:w-auto px-8">
-                콘텐츠 보기
+                회고 콘텐츠 살펴보기
               </Button>
             </Link>
           </div>
