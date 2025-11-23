@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoginButton } from '@/components/auth/LoginButton';
+import { EmailPasswordForm } from '@/components/auth/EmailPasswordForm';
 import { useAuth } from '@/context/AuthContext';
 import { FileText, History, BarChart3 } from 'lucide-react';
 
-const emailLoginAvailable = false;
+const emailLoginAvailable = true;
 
 export default function LoginPage() {
   const { user, loading } = useAuth();
@@ -57,16 +58,29 @@ export default function LoginPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md space-y-6">
-        {!emailLoginAvailable && (
+        {/* 이메일 로그인 */}
+        {emailLoginAvailable && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-center text-lg">카카오 로그인으로 이용해 주세요</CardTitle>
+              <CardTitle className="text-center text-lg">이메일 로그인</CardTitle>
             </CardHeader>
-            <CardContent className="text-center">
-              <LoginButton className="w-full" />
+            <CardContent>
+              <EmailPasswordForm />
             </CardContent>
           </Card>
         )}
+
+        {/* 카카오 로그인 */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-center text-lg">
+              {emailLoginAvailable ? '또는' : '카카오 로그인으로 이용해 주세요'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <LoginButton className="w-full" />
+          </CardContent>
+        </Card>
 
         <div className="pt-2">
           <Card>

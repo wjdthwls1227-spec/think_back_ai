@@ -21,11 +21,11 @@ function editorDataToHTML(data: FreeContent): string {
     
     switch (type) {
       case 'paragraph':
-        return `<p>${blockData?.text || ''}</p>`;
+        return `<p class="mb-4 leading-relaxed">${blockData?.text || ''}</p>`;
       
       case 'header':
-        const level = blockData?.level || 1;
-        return `<h${level}>${blockData?.text || ''}</h${level}>`;
+        const level = Math.min(Math.max(blockData?.level || 2, 1), 6);
+        return `<h${level} class="font-bold mb-4 mt-6">${blockData?.text || ''}</h${level}>`;
       
       case 'list':
         const items = (blockData?.items as string[]) || [];
@@ -54,7 +54,10 @@ function editorDataToHTML(data: FreeContent): string {
         const imageData = blockData as { file?: { url?: string }; url?: string; caption?: string };
         const url = imageData?.file?.url || imageData?.url || '';
         const caption = imageData?.caption || '';
-        return `<figure><img src="${url}" alt="${caption}" class="w-full h-auto rounded-lg my-4" /><figcaption>${caption}</figcaption></figure>`;
+        if (caption) {
+          return `<figure class="my-6"><img src="${url}" alt="${caption}" class="w-full h-auto rounded-lg shadow-md" /><figcaption class="text-sm text-gray-600 dark:text-gray-400 text-center mt-2">${caption}</figcaption></figure>`;
+        }
+        return `<figure class="my-6"><img src="${url}" alt="" class="w-full h-auto rounded-lg shadow-md" /></figure>`;
       
       case 'toggle':
         const toggleTitle = blockData?.title || '';
@@ -266,10 +269,12 @@ export function RichTextEditor({ initialData = '', onChange, placeholder = '내�
               },
               tools: {
                 header: {
-                  "Heading 1": '제목 1',
-                  "Heading 2": '제목 2',
-                  "Heading 3": '제목 3',
-                  "Heading 4": '제목 4',
+                  "Heading 1": '제목 1 (가장 큰 제목)',
+                  "Heading 2": '제목 2 (큰 제목)',
+                  "Heading 3": '제목 3 (중간 제목)',
+                  "Heading 4": '제목 4 (작은 제목)',
+                  "Heading 5": '제목 5 (더 작은 제목)',
+                  "Heading 6": '제목 6 (가장 작은 제목)',
                 },
                 list: {
                   Ordered: '번호 목록',
@@ -298,27 +303,28 @@ export function RichTextEditor({ initialData = '', onChange, placeholder = '내�
           tools: {
             paragraph: {
               class: Paragraph,
-              inlineToolbar: true,
+              inlineToolbar: ['bold', 'italic', 'link', 'textColor'],
             },
             header: {
               class: Header,
               config: {
-                levels: [1, 2, 3, 4],
+                levels: [1, 2, 3, 4, 5, 6],
                 defaultLevel: 2,
+                placeholder: '제목을 입력하세요',
               },
-              inlineToolbar: true,
+              inlineToolbar: ['bold', 'italic', 'link', 'textColor'],
             },
             list: {
               class: List,
-              inlineToolbar: true,
+              inlineToolbar: ['bold', 'italic', 'link', 'textColor'],
             },
             checklist: {
               class: Checklist,
-              inlineToolbar: true,
+              inlineToolbar: ['bold', 'italic', 'textColor'],
             },
             table: {
               class: Table,
-              inlineToolbar: true,
+              inlineToolbar: ['bold', 'italic', 'textColor'],
               config: {
                 rows: 2,
                 cols: 2,
@@ -328,16 +334,21 @@ export function RichTextEditor({ initialData = '', onChange, placeholder = '내�
               class: ImageTool,
               config: {
                 captionPlaceholder: '이미지 설명을 입력하세요 (선택사항)',
-                buttonContent: '이미지 삽입',
+                buttonContent: '📷 이미지 삽입',
                 uploader: {
                   async uploadByFile(file: File) {
+                    // 파일 크기 제한 (10MB)
+                    const maxSize = 10 * 1024 * 1024; // 10MB
+                    if (file.size > maxSize) {
+                      throw new Error('이미지 크기는 10MB 이하여야 합니다.');
+                    }
+
+                    if (!file.type.startsWith('image/')) {
+                      throw new Error('이미지 파일만 업로드할 수 있습니다.');
+                    }
+                    
                     // Base64로 변환하여 저장 (실제 프로덕션에서는 서버에 업로드하는 것이 좋습니다)
                     return new Promise((resolve, reject) => {
-                      if (!file.type.startsWith('image/')) {
-                        reject(new Error('이미지 파일만 업로드할 수 있습니다.'));
-                        return;
-                      }
-                      
                       const reader = new FileReader();
                       reader.onload = (e) => {
                         const url = e.target?.result as string;
@@ -355,6 +366,13 @@ export function RichTextEditor({ initialData = '', onChange, placeholder = '내�
                     });
                   },
                   async uploadByUrl(url: string) {
+                    // URL 유효성 검사
+                    try {
+                      new URL(url);
+                    } catch {
+                      throw new Error('유효한 이미지 URL을 입력해주세요.');
+                    }
+
                     // URL로 이미지 가져오기
                     return {
                       success: 1,
@@ -364,11 +382,15 @@ export function RichTextEditor({ initialData = '', onChange, placeholder = '내�
                     };
                   },
                 },
+                endpoints: {
+                  byFile: '', // 파일 업로드는 uploader에서 처리
+                  byUrl: '', // URL은 uploader에서 처리
+                },
               },
             },
             quote: {
               class: Quote,
-              inlineToolbar: true,
+              inlineToolbar: ['bold', 'italic', 'link', 'textColor'],
               shortcut: 'CMD+SHIFT+O',
               config: {
                 quotePlaceholder: '인용구를 입력하세요',
@@ -384,6 +406,7 @@ export function RichTextEditor({ initialData = '', onChange, placeholder = '내�
             },
             toggle: {
               class: ToggleBlock,
+              inlineToolbar: ['bold', 'italic', 'link', 'textColor'],
             },
           },
           onChange: async () => {

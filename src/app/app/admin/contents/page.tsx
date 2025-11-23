@@ -6,7 +6,7 @@ import type { Content } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { BookOpen, Users, Package, Plus, Edit, Trash2 } from 'lucide-react';
+import { BookOpen, Users, Package, Plus, Edit, Trash2, Search, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -29,14 +29,10 @@ export default function AdminContentsPage() {
   const { user, isAdmin, loading: authLoading } = useAuth();
   const router = useRouter();
   const [contents, setContents] = useState<Content[]>([]);
+  const [filteredContents, setFilteredContents] = useState<Content[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // 컴포넌트 마운트 확인
-  console.log('AdminContentsPage - Component mounted', {
-    user: user?.email,
-    isAdmin,
-    authLoading
-  });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     slug: '',
@@ -70,6 +66,25 @@ export default function AdminContentsPage() {
     loadContents();
   }, [user, isAdmin, router]);
 
+  // 검색 필터링
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredContents(contents);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase();
+    const filtered = contents.filter((content) => {
+      return (
+        content.title.toLowerCase().includes(query) ||
+        content.subtitle?.toLowerCase().includes(query) ||
+        content.slug.toLowerCase().includes(query) ||
+        typeLabels[content.type as keyof typeof typeLabels].toLowerCase().includes(query)
+      );
+    });
+    setFilteredContents(filtered);
+  }, [searchQuery, contents]);
+
   const loadContents = async () => {
     try {
       console.log('loadContents: Starting to fetch contents...');
@@ -89,8 +104,8 @@ export default function AdminContentsPage() {
       }
 
       console.log('loadContents: Fetched contents:', data?.length || 0, 'items');
-      console.log('loadContents: Contents data:', data);
       setContents(data || []);
+      setFilteredContents(data || []);
     } catch (error: unknown) {
       console.error('Error loading contents:', error);
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -114,10 +129,36 @@ export default function AdminContentsPage() {
       is_published: content.is_published,
       meta: content.meta ? JSON.stringify(content.meta, null, 2) : '',
     });
+    setShowForm(true);
+    // 폼으로 스크롤
+    setTimeout(() => {
+      document.getElementById('content-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+
+  const handleNew = () => {
+    setEditingId(null);
+    setFormData({
+      slug: '',
+      type: 'workbook',
+      title: '',
+      subtitle: '',
+      description: '',
+      thumbnail_image_url: '',
+      detail_image_url: '',
+      price: 0,
+      is_published: false,
+      meta: '',
+    });
+    setShowForm(true);
+    setTimeout(() => {
+      document.getElementById('content-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleCancel = () => {
     setEditingId(null);
+    setShowForm(false);
     setFormData({
       slug: '',
       type: 'workbook',
@@ -186,7 +227,6 @@ export default function AdminContentsPage() {
       };
 
       // 이미지 URL 필드는 컬럼이 존재하는 경우에만 추가
-      // (데이터베이스에 컬럼이 없으면 에러 발생 방지)
       if (formData.thumbnail_image_url?.trim()) {
         contentData.thumbnail_image_url = formData.thumbnail_image_url.trim();
       }
@@ -194,7 +234,7 @@ export default function AdminContentsPage() {
         contentData.detail_image_url = formData.detail_image_url.trim();
       }
 
-      // null 값 제거 (Supabase가 null을 허용하지만, 빈 문자열과 혼동 방지)
+      // null 값 제거
       Object.keys(contentData).forEach(key => {
         const typedKey = key as keyof typeof contentData;
         if (contentData[typedKey] === '') {
@@ -220,31 +260,6 @@ export default function AdminContentsPage() {
         result = data;
       } else {
         console.log('Attempting to insert content...');
-        console.log('Content data to insert:', JSON.stringify(contentData, null, 2));
-        console.log('Current user ID:', user?.id);
-        console.log('Current user email:', user?.email);
-        
-        // 사용자 세션 확인
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        console.log('Session check:', {
-          hasSession: !!session,
-          sessionUserId: session?.user?.id,
-          sessionError: sessionError?.message,
-        });
-        
-        // is_admin 함수 직접 테스트 (디버깅용)
-        try {
-          const { data: adminTest, error: adminTestError } = await supabase.rpc('is_admin', {
-            user_id: user?.id || ''
-          });
-          console.log('is_admin function test:', {
-            result: adminTest,
-            error: adminTestError?.message,
-          });
-        } catch (rpcError) {
-          console.warn('is_admin RPC test failed (this is OK if function uses different signature):', rpcError);
-        }
-        
         const { data, error } = await supabase
           .from('contents')
           .insert(contentData)
@@ -252,10 +267,6 @@ export default function AdminContentsPage() {
 
         if (error) {
           console.error('Insert error - Full error object:', error);
-          console.error('Insert error - Message:', error.message);
-          console.error('Insert error - Details:', error.details);
-          console.error('Insert error - Hint:', error.hint);
-          console.error('Insert error - Code:', error.code);
           throw error;
         }
         console.log('Insert success:', data);
@@ -276,9 +287,6 @@ export default function AdminContentsPage() {
       console.log('Contents list reloaded');
     } catch (error: unknown) {
       console.error('Submit error - Full error:', error);
-      console.error('Submit error - Type:', typeof error);
-      console.error('Submit error - Keys:', error && typeof error === 'object' ? Object.keys(error) : []);
-      
       const errorObj = error && typeof error === 'object' ? error as { message?: string; error_description?: string; details?: string; hint?: string; error?: string; code?: string } : null;
       const errorMessage = errorObj?.message || errorObj?.error_description || '알 수 없는 오류가 발생했습니다.';
       const errorDetails = errorObj?.details || errorObj?.hint || errorObj?.error || '';
@@ -308,6 +316,7 @@ export default function AdminContentsPage() {
 
       if (error) throw error;
       loadContents();
+      alert('콘텐츠가 삭제되었습니다.');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
       alert(`오류: ${errorMessage}`);
@@ -317,9 +326,6 @@ export default function AdminContentsPage() {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ko-KR').format(price);
   };
-
-  // 디버깅: 상태 확인
-  console.log('AdminContentsPage Render - loading:', loading, 'isAdmin:', isAdmin, 'user:', user?.email, 'contents count:', contents.length);
 
   if (loading) {
     return (
@@ -332,15 +338,11 @@ export default function AdminContentsPage() {
     );
   }
 
-  // isAdmin이 false면 경고 메시지 표시
   if (!isAdmin) {
     return (
       <div className="p-8">
         <div className="text-center">
           <p className="text-red-600 dark:text-red-400">관리자 권한이 없습니다.</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-            isAdmin: {String(isAdmin)}, user: {user?.email || '없음'}
-          </p>
         </div>
       </div>
     );
@@ -350,285 +352,338 @@ export default function AdminContentsPage() {
     <div>
       <AdminNav />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          회고 콘텐츠 관리
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          회고 콘텐츠를 등록, 수정, 삭제할 수 있습니다.
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              회고 콘텐츠 관리
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              회고 콘텐츠를 등록, 수정, 삭제할 수 있습니다.
+            </p>
+          </div>
+          <Button onClick={handleNew} className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            새 콘텐츠 작성
+          </Button>
+        </div>
       </div>
 
+      {/* 검색 바 */}
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Input
+              type="text"
+              placeholder="제목, 부제목, Slug로 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* 생성/수정 폼 */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>
-            {editingId ? '콘텐츠 수정' : '새 콘텐츠 생성'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Slug *
-                </label>
-                <Input
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  required
-                  placeholder="daily-retrospect-workbook"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  타입 *
-                </label>
-                <select
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value as 'workbook' | 'cohort' | 'bundle' })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800"
-                  required
-                >
-                  <option value="workbook">워크북</option>
-                  <option value="cohort">커뮤니티</option>
-                  <option value="bundle">패키지</option>
-                </select>
-              </div>
+      {showForm && (
+        <Card id="content-form" className="mb-8">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>
+                {editingId ? '콘텐츠 수정' : '새 콘텐츠 생성'}
+              </CardTitle>
+              <Button variant="ghost" size="sm" onClick={handleCancel}>
+                <X className="w-4 h-4" />
+              </Button>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                제목 *
-              </label>
-              <Input
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                부제목
-              </label>
-              <Input
-                value={formData.subtitle}
-                onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                설명 (네이버 블로그 스타일 에디터)
-              </label>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                네이버 블로그처럼 이미지, 텍스트 서식, 리스트 등을 쉽게 작성할 수 있습니다. 이미지는 파일을 드래그하거나 URL을 입력하여 삽입할 수 있습니다.
-              </p>
-              <RichTextEditor
-                initialData={formData.description}
-                onChange={(html) => setFormData({ ...formData, description: html })}
-                placeholder="상품 설명을 작성하세요. 이미지, 제목, 리스트 등을 자유롭게 사용할 수 있습니다."
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  썸네일 이미지 URL
-                </label>
-                <Input
-                  type="url"
-                  value={formData.thumbnail_image_url}
-                  onChange={(e) => setFormData({ ...formData, thumbnail_image_url: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
-                />
-                {formData.thumbnail_image_url && (
-                  <div className="mt-2">
-                    <img 
-                      src={formData.thumbnail_image_url} 
-                      alt="썸네일 미리보기"
-                      className="w-full h-32 object-cover rounded border"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  상세 이미지 URL
-                </label>
-                <Input
-                  type="url"
-                  value={formData.detail_image_url}
-                  onChange={(e) => setFormData({ ...formData, detail_image_url: e.target.value })}
-                  placeholder="https://example.com/detail-image.jpg"
-                />
-                {formData.detail_image_url && (
-                  <div className="mt-2">
-                    <img 
-                      src={formData.detail_image_url} 
-                      alt="상세 이미지 미리보기"
-                      className="w-full h-32 object-cover rounded border"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  가격 (원) *
-                </label>
-                <Input
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                  required
-                  min="0"
-                />
-              </div>
-              <div className="flex items-center pt-8">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_published}
-                    onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
-                    className="mr-2"
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Slug *
+                  </label>
+                  <Input
+                    value={formData.slug}
+                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                    required
+                    placeholder="daily-retrospect-workbook"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">공개</span>
-                </label>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    타입 *
+                  </label>
+                  <select
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value as 'workbook' | 'cohort' | 'bundle' })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800"
+                    required
+                  >
+                    <option value="workbook">워크북</option>
+                    <option value="cohort">커뮤니티</option>
+                    <option value="bundle">패키지</option>
+                  </select>
+                </div>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Meta (JSON) - 문제, 효과, 커리큘럼 등
-              </label>
-              <Textarea
-                value={formData.meta}
-                onChange={(e) => setFormData({ ...formData, meta: e.target.value })}
-                rows={8}
-                className="font-mono text-sm"
-                placeholder={`{
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  제목 *
+                </label>
+                <Input
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  부제목
+                </label>
+                <Input
+                  value={formData.subtitle}
+                  onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  설명 (네이버 블로그 스타일 에디터)
+                </label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  네이버 블로그처럼 이미지, 텍스트 서식, 리스트 등을 쉽게 작성할 수 있습니다.
+                </p>
+                <RichTextEditor
+                  initialData={formData.description}
+                  onChange={(html) => setFormData({ ...formData, description: html })}
+                  placeholder="상품 설명을 작성하세요. 이미지, 제목, 리스트 등을 자유롭게 사용할 수 있습니다."
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    썸네일 이미지 URL
+                  </label>
+                  <Input
+                    type="url"
+                    value={formData.thumbnail_image_url}
+                    onChange={(e) => setFormData({ ...formData, thumbnail_image_url: e.target.value })}
+                    placeholder="https://example.com/image.jpg"
+                  />
+                  {formData.thumbnail_image_url && (
+                    <div className="mt-2">
+                      <img 
+                        src={formData.thumbnail_image_url} 
+                        alt="썸네일 미리보기"
+                        className="w-full h-32 object-cover rounded border"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    상세 이미지 URL
+                  </label>
+                  <Input
+                    type="url"
+                    value={formData.detail_image_url}
+                    onChange={(e) => setFormData({ ...formData, detail_image_url: e.target.value })}
+                    placeholder="https://example.com/detail-image.jpg"
+                  />
+                  {formData.detail_image_url && (
+                    <div className="mt-2">
+                      <img 
+                        src={formData.detail_image_url} 
+                        alt="상세 이미지 미리보기"
+                        className="w-full h-32 object-cover rounded border"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    가격 (원) *
+                  </label>
+                  <Input
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                    required
+                    min="0"
+                  />
+                </div>
+                <div className="flex items-center pt-8">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.is_published}
+                      onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">공개</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Meta (JSON) - 문제, 효과, 커리큘럼 등
+                </label>
+                <Textarea
+                  value={formData.meta}
+                  onChange={(e) => setFormData({ ...formData, meta: e.target.value })}
+                  rows={8}
+                  className="font-mono text-sm"
+                  placeholder={`{
   "problem": "이 콘텐츠가 해결하는 문제 (HTML 지원)",
   "benefit": "기대되는 변화 (HTML 지원)",
   "curriculum": ["1주차: 회고의 기초", "2주차: KPT 템플릿 활용"],
   "description": "상세 설명 (HTML 지원)"
 }`}
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                problem, benefit, description 필드는 HTML을 지원합니다.
-              </p>
-            </div>
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  problem, benefit, description 필드는 HTML을 지원합니다.
+                </p>
+              </div>
 
-            <div className="flex gap-2">
-              <Button type="submit">
-                {editingId ? '수정하기' : '생성하기'}
-              </Button>
-              {editingId && (
+              <div className="flex gap-2">
+                <Button type="submit">
+                  {editingId ? '수정하기' : '생성하기'}
+                </Button>
                 <Button type="button" variant="outline" onClick={handleCancel}>
                   취소
                 </Button>
-              )}
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* 콘텐츠 리스트 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>콘텐츠 목록</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900 dark:text-white">
-                    제목
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900 dark:text-white">
-                    타입
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900 dark:text-white">
-                    가격
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900 dark:text-white">
-                    공개
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900 dark:text-white">
-                    생성일
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-900 dark:text-white">
-                    작업
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {contents.map((content) => {
-                  const Icon = typeIcons[content.type as keyof typeof typeIcons];
-                  return (
-                    <tr key={content.id} className="border-b border-gray-200 dark:border-gray-700">
-                      <td className="py-3 px-4">
-                        <div className="flex items-center">
-                          <Icon className="w-4 h-4 text-gray-400 mr-2" />
-                          <span className="text-gray-900 dark:text-white">{content.title}</span>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
+      {/* 콘텐츠 카드 리스트 */}
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          콘텐츠 목록 ({filteredContents.length}개)
+        </h2>
+      </div>
+
+      {filteredContents.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-gray-500 dark:text-gray-400">
+              {searchQuery ? '검색 결과가 없습니다.' : '등록된 콘텐츠가 없습니다.'}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredContents.map((content) => {
+            const Icon = typeIcons[content.type as keyof typeof typeIcons];
+            return (
+              <Card
+                key={content.id}
+                className="cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => handleEdit(content)}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
                         {typeLabels[content.type as keyof typeof typeLabels]}
-                      </td>
-                      <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
-                        {formatPrice(content.price)}원
-                      </td>
-                      <td className="py-3 px-4">
-                        {content.is_published ? (
-                          <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs">
-                            공개
-                          </span>
-                        ) : (
-                          <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs">
-                            비공개
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
-                        {new Date(content.created_at).toLocaleDateString('ko-KR')}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEdit(content)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(content.id)}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-600" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                      </span>
+                    </div>
+                    {content.is_published ? (
+                      <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded text-xs">
+                        공개
+                      </span>
+                    ) : (
+                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded text-xs">
+                        비공개
+                      </span>
+                    )}
+                  </div>
+                  
+                  <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-2 line-clamp-2">
+                    {content.title}
+                  </h3>
+                  
+                  {content.subtitle && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                      {content.subtitle}
+                    </p>
+                  )}
+
+                  {content.thumbnail_image_url && (
+                    <div className="mb-3">
+                      <img
+                        src={content.thumbnail_image_url}
+                        alt={content.title}
+                        className="w-full h-32 object-cover rounded"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <span className="text-lg font-bold text-gray-900 dark:text-white">
+                      {formatPrice(content.price)}원
+                    </span>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(content);
+                        }}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(content.id);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    {new Date(content.created_at).toLocaleDateString('ko-KR')}
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
-

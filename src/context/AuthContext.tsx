@@ -12,7 +12,7 @@ interface AuthContextType {
   signInWithKakao: () => Promise<void>;
   signInWithMagicLink: (email: string) => Promise<void>;
   signInWithPassword: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, displayName: string) => Promise<void>;
+  signUp: (email: string, password: string, displayName: string, signupPath?: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshAdminStatus: () => Promise<void>;
 }
@@ -201,27 +201,71 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, displayName: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name: displayName,
-          display_name: displayName,
+  const signUp = async (email: string, password: string, displayName: string, signupPath?: string) => {
+    console.log('📧 [SignUp] ========== Starting signup process ==========');
+    console.log('📧 [SignUp] Email:', email);
+    console.log('📧 [SignUp] Display Name:', displayName);
+    console.log('📧 [SignUp] Signup Path:', signupPath);
+    console.log('📧 [SignUp] Redirect URL:', `${window.location.origin}/auth/callback`);
+    console.log('📧 [SignUp] Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+    
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: displayName,
+            display_name: displayName,
+            signup_path: signupPath,
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+      });
 
-    if (error) {
-      console.error('Error signing up:', error);
-      throw error;
-    }
+      if (error) {
+        console.error('❌ [SignUp] ========== SIGNUP FAILED ==========');
+        console.error('❌ [SignUp] Error object:', error);
+        console.error('❌ [SignUp] Error message:', error.message);
+        console.error('❌ [SignUp] Error status:', error.status);
+        console.error('❌ [SignUp] Error code:', error.code);
+        console.error('❌ [SignUp] Full error:', JSON.stringify(error, null, 2));
+        throw error;
+      }
 
-    // 프로필 생성
-    if (data.user) {
-      const profileData = {
+      console.log('✅ [SignUp] ========== SIGNUP API CALL SUCCESSFUL ==========');
+      console.log('✅ [SignUp] Response data:', data);
+      console.log('✅ [SignUp] User ID:', data.user?.id);
+      console.log('✅ [SignUp] User email:', data.user?.email);
+      console.log('✅ [SignUp] Email confirmed:', data.user?.email_confirmed_at ? 'Yes' : 'No');
+      console.log('✅ [SignUp] Session:', data.session ? 'Created' : 'Not created');
+      
+      if (!data.user) {
+        console.error('❌ [SignUp] ⚠️ WARNING: User object is null/undefined!');
+        console.error('❌ [SignUp] This means the signup failed even though no error was returned.');
+        throw new Error('User creation failed: User object is null');
+      }
+    
+      // 이메일 전송 여부 확인
+      if (data.user && !data.user.email_confirmed_at) {
+        console.log('📧 [SignUp] ⚠️ Email confirmation required - check your email inbox');
+        console.log('📧 [SignUp] ⚠️ If email not received, check:');
+        console.log('   1. Supabase Dashboard → Authentication → Providers → Email');
+        console.log('   2. "Enable email confirmations" should be ON');
+        console.log('   3. Check spam folder');
+        console.log('   4. Supabase Dashboard → Logs → Auth Logs for errors');
+      }
+
+      // 프로필 생성 (가입경로 포함)
+      if (data.user) {
+      const profileData: {
+        id: string;
+        email: string;
+        name: string;
+        display_name: string;
+        role: 'user';
+        signup_path?: string;
+      } = {
         id: data.user.id,
         email: data.user.email || email,
         name: displayName,
@@ -229,14 +273,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role: 'user' as const,
       };
 
-      const { error: profileError } = await supabase
+      // 가입경로가 있으면 추가 (컬럼이 존재하는 경우에만)
+      if (signupPath) {
+        profileData.signup_path = signupPath;
+      }
+
+      const { data: insertedProfile, error: profileError } = await supabase
         .from('profiles')
-        .insert(profileData);
+        .insert(profileData)
+        .select();
 
       if (profileError) {
-        console.error('Error creating profile:', profileError);
-        // 프로필 생성 실패해도 계정은 생성됨
+        console.error('❌ Error creating profile:', profileError);
+        console.error('Profile data attempted:', profileData);
+        console.error('Error details:', {
+          message: profileError.message,
+          details: profileError.details,
+          hint: profileError.hint,
+          code: profileError.code,
+        });
+        
+        // signup_path 컬럼이 없어서 발생한 에러인 경우, signup_path 없이 재시도
+        if (profileError.code === 'PGRST204' || profileError.message?.includes('signup_path')) {
+          console.log('🔄 Retrying without signup_path...');
+          const { error: retryError } = await supabase
+            .from('profiles')
+            .insert({
+              id: data.user.id,
+              email: data.user.email || email,
+              name: displayName,
+              display_name: displayName,
+              role: 'user' as const,
+            });
+          
+          if (retryError) {
+            console.error('❌ Retry also failed:', retryError);
+          } else {
+            console.log('✅ Profile created without signup_path');
+          }
+        }
+        // 프로필 생성 실패해도 계정은 생성됨 (나중에 트리거로 자동 생성될 수 있음)
+      } else {
+        console.log('✅ Profile created successfully:', insertedProfile);
       }
+      }
+    } catch (err) {
+      console.error('❌ [SignUp] ========== EXCEPTION IN SIGNUP ==========');
+      console.error('❌ [SignUp] Exception:', err);
+      console.error('❌ [SignUp] Exception type:', typeof err);
+      console.error('❌ [SignUp] Exception details:', JSON.stringify(err, null, 2));
+      throw err;
     }
   };
 

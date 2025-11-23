@@ -120,10 +120,15 @@ export function EmailPasswordForm() {
             {loading ? '로그인 중...' : '로그인'}
           </Button>
 
-          <div className="text-center text-sm">
-            <Link href="/signup" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+          <div className="text-center text-sm space-y-2">
+            <Link href="/signup" className="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
               계정이 없으신가요? 회원가입
             </Link>
+            {error && error.includes('이메일 인증') && (
+              <Link href="/auth/resend-email" className="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-xs">
+                인증 메일 재전송하기
+              </Link>
+            )}
           </div>
         </form>
       </CardContent>

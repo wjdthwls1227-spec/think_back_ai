@@ -106,6 +106,7 @@ export interface Profile {
   avatar_url?: string | null;
   role: 'user' | 'admin';
   ai_plan_until?: string | null;
+  signup_path?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -133,6 +134,7 @@ export interface CommunityCase {
   body?: string | null;
   category?: string | null;
   is_featured: boolean;
+  image_url?: string | null;
   created_at: string;
 }
 
