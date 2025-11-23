@@ -204,7 +204,7 @@ function HistoryContent() {
       return (
         <EditJournalContent
           journal={journal}
-          onSave={(content) => handleSaveEdit(journal.id, content)}
+          onSave={(title, content) => handleSaveEdit(journal.id, title, content)}
           onCancel={handleCancelEdit}
           saving={saving}
         />
