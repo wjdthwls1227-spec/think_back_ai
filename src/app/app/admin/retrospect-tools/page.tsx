@@ -10,13 +10,14 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { AdminNav } from '../AdminNav';
+import type { RetrospectTool } from '@/types';
 
 const categories = ['노트', '필기구', '도서', '디지털', '기타'];
 
 export default function AdminRetrospectToolsPage() {
   const { user, isAdmin } = useAuth();
   const router = useRouter();
-  const [tools, setTools] = useState<any[]>([]);
+  const [tools, setTools] = useState<RetrospectTool[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -69,11 +70,12 @@ export default function AdminRetrospectToolsPage() {
       }
       setTools(data || []);
       setMessage(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading tools:', error);
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
       setMessage({ 
         type: 'error', 
-        text: `도구 목록을 불러오는 중 오류가 발생했습니다: ${error.message || '알 수 없는 오류'}` 
+        text: `도구 목록을 불러오는 중 오류가 발생했습니다: ${errorMessage}` 
       });
       setTools([]);
     } finally {
@@ -81,7 +83,7 @@ export default function AdminRetrospectToolsPage() {
     }
   };
 
-  const handleEdit = (tool: any) => {
+  const handleEdit = (tool: RetrospectTool) => {
     setEditingId(tool.id);
     setFormData({
       category: tool.category,
@@ -174,9 +176,10 @@ export default function AdminRetrospectToolsPage() {
       
       // 성공 메시지 3초 후 자동 제거
       setTimeout(() => setMessage(null), 3000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving tool:', error);
-      setMessage({ type: 'error', text: `저장 중 오류가 발생했습니다: ${error.message || '알 수 없는 오류'}` });
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
+      setMessage({ type: 'error', text: `저장 중 오류가 발생했습니다: ${errorMessage}` });
     } finally {
       setSaving(false);
     }
@@ -245,7 +248,7 @@ export default function AdminRetrospectToolsPage() {
                 </label>
                 <select
                   value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value as '노트' | '필기구' | '도서' | '디지털' | '기타' })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800"
                   required
                 >

@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import OpenAI from 'openai';
 import { cookies } from 'next/headers';
 import type { Database } from '@/lib/supabase';
+import type { Journal, WeeklyAnalysisResult, KPTContent, PMIContent, FreeContent, FourLContent } from '@/types';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
       hasUserInfo: !!userInfo,
       hasJournalsData: !!journalsData,
       journalsDataCount: journalsData?.length || 0,
-      journalsDataIds: journalsData?.map((j: any) => j?.id) || [],
+      journalsDataIds: journalsData?.map((j: Journal) => j?.id) || [],
     });
     
     // Authorization 헤더에서 토큰 가져오기
@@ -241,8 +242,8 @@ export async function POST(request: NextRequest) {
     });
     
     // 클라이언트에서 전달한 회고 데이터가 있으면 우선 사용 (RLS 우회)
-    let journals: any[] | null = null;
-    let journalsError: any = null;
+    let journals: Journal[] | null = null;
+    let journalsError: Error | null = null;
     
     console.log('Checking journals data for weekly:', {
       hasJournalsData: !!journalsData,
@@ -254,8 +255,8 @@ export async function POST(request: NextRequest) {
     if (journalsData && Array.isArray(journalsData) && journalsData.length > 0) {
       console.log('✅ Using client-provided journals data (priority):', {
         count: journalsData.length,
-        ids: journalsData.map((j: any) => j?.id),
-        dates: journalsData.map((j: any) => ({ 
+        ids: journalsData.map((j: Journal) => j?.id),
+        dates: journalsData.map((j: Journal) => ({ 
           id: j?.id, 
           date: j?.date, 
           dateString: String(j?.date),
@@ -409,7 +410,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function formatJournalContent(content: any, type: string): string {
+function formatJournalContent(content: KPTContent | PMIContent | FreeContent | FourLContent, type: string): string {
   if (type === 'daily' || type === 'FREE') {
     return typeof content === 'string' ? content : JSON.stringify(content);
   }

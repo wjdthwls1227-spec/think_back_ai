@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
+import type { RetrospectTool } from '@/types';
 
 export type RetrospectTool = {
   id: string;
@@ -34,7 +35,7 @@ export function RetrospectTools() {
 
         if (error) throw error;
 
-        const formattedTools: RetrospectTool[] = (data || []).map((tool: any) => ({
+        const formattedTools: RetrospectTool[] = (data || []).map((tool: RetrospectTool) => ({
           id: tool.id,
           category: tool.category,
           name: tool.name,
@@ -45,7 +46,7 @@ export function RetrospectTools() {
         }));
 
         setTools(formattedTools);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error loading tools:', error);
         // 테이블이 없으면 빈 배열로 설정 (에러 메시지는 표시하지 않음)
         setTools([]);

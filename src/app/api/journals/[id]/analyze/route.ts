@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import OpenAI from 'openai';
 import { cookies } from 'next/headers';
 import type { Database } from '@/lib/supabase';
+import type { KPTContent, PMIContent, FreeContent, FourLContent } from '@/types';
 
 export async function POST(
   request: NextRequest,
@@ -237,7 +238,7 @@ export async function POST(
 }
 
 // 회고 내용을 텍스트로 변환하는 함수
-function formatJournalContent(content: any, type: string): string {
+function formatJournalContent(content: KPTContent | PMIContent | FreeContent | FourLContent, type: string): string {
   if (type === 'FREE') {
     return typeof content === 'string' ? content : JSON.stringify(content);
   }

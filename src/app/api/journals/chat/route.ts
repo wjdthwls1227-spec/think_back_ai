@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import OpenAI from 'openai';
 import { cookies } from 'next/headers';
 import type { Database } from '@/lib/supabase';
+import type { WeeklyAnalysisResult, MonthlyAnalysisResult } from '@/types';
 
 export async function POST(request: NextRequest) {
   try {
@@ -200,56 +201,54 @@ ${contextText}
   }
 }
 
-function formatAnalysisContext(context: any, period: 'weekly' | 'monthly'): string {
+function formatAnalysisContext(context: WeeklyAnalysisResult | MonthlyAnalysisResult, period: 'weekly' | 'monthly'): string {
   let text = '';
   
   if (period === 'weekly') {
-    text += `주간 분석 요약:\n${context.summary || ''}\n\n`;
+    const weeklyContext = context as WeeklyAnalysisResult;
+    text += `주간 분석 요약:\n${weeklyContext.summary || ''}\n\n`;
     
-    if (context.keywords && context.keywords.length > 0) {
-      text += `주요 키워드: ${context.keywords.join(', ')}\n\n`;
+    if (weeklyContext.themes && weeklyContext.themes.length > 0) {
+      text += `주요 테마: ${weeklyContext.themes.join(', ')}\n\n`;
     }
     
-    if (context.patterns && context.patterns.length > 0) {
-      text += `패턴:\n${context.patterns.map((p: string, i: number) => `${i + 1}. ${p}`).join('\n')}\n\n`;
+    if (weeklyContext.achievements && weeklyContext.achievements.length > 0) {
+      text += `성과:\n${weeklyContext.achievements.map((p: string, i: number) => `${i + 1}. ${p}`).join('\n')}\n\n`;
     }
     
-    if (context.improvements && context.improvements.length > 0) {
-      text += `개선점:\n${context.improvements.map((p: string, i: number) => `${i + 1}. ${p}`).join('\n')}\n\n`;
+    if (weeklyContext.challenges && weeklyContext.challenges.length > 0) {
+      text += `도전과제:\n${weeklyContext.challenges.map((p: string, i: number) => `${i + 1}. ${p}`).join('\n')}\n\n`;
     }
     
-    if (context.weeklyTrend) {
-      text += `주간 트렌드: ${context.weeklyTrend}\n\n`;
+    if (weeklyContext.insights && weeklyContext.insights.length > 0) {
+      text += `인사이트:\n${weeklyContext.insights.map((p: string, i: number) => `${i + 1}. ${p}`).join('\n')}\n\n`;
     }
     
-    if (context.nextWeekGoals && context.nextWeekGoals.length > 0) {
-      text += `다음 주 목표:\n${context.nextWeekGoals.map((g: string, i: number) => `${i + 1}. ${g}`).join('\n')}\n`;
+    if (weeklyContext.recommendations && weeklyContext.recommendations.length > 0) {
+      text += `추천사항:\n${weeklyContext.recommendations.map((g: string, i: number) => `${i + 1}. ${g}`).join('\n')}\n`;
     }
   } else {
-    text += `월간 분석 요약:\n${context.summary || ''}\n\n`;
+    const monthlyContext = context as MonthlyAnalysisResult;
+    text += `월간 분석 요약:\n${monthlyContext.summary || ''}\n\n`;
     
-    if (context.keywords && context.keywords.length > 0) {
-      text += `주요 키워드: ${context.keywords.join(', ')}\n\n`;
+    if (monthlyContext.keyEvents && monthlyContext.keyEvents.length > 0) {
+      text += `주요 이벤트:\n${monthlyContext.keyEvents.map((e: string, i: number) => `${i + 1}. ${e}`).join('\n')}\n\n`;
     }
     
-    if (context.longTermPatterns && context.longTermPatterns.length > 0) {
-      text += `장기 패턴:\n${context.longTermPatterns.map((p: string, i: number) => `${i + 1}. ${p}`).join('\n')}\n\n`;
+    if (monthlyContext.patterns && monthlyContext.patterns.length > 0) {
+      text += `패턴:\n${monthlyContext.patterns.map((p: string, i: number) => `${i + 1}. ${p}`).join('\n')}\n\n`;
     }
     
-    if (context.growthAreas && context.growthAreas.length > 0) {
-      text += `성장 영역:\n${context.growthAreas.map((g: string, i: number) => `${i + 1}. ${g}`).join('\n')}\n\n`;
+    if (monthlyContext.growthAreas && monthlyContext.growthAreas.length > 0) {
+      text += `성장 영역:\n${monthlyContext.growthAreas.map((g: string, i: number) => `${i + 1}. ${g}`).join('\n')}\n\n`;
     }
     
-    if (context.monthlyTrend) {
-      text += `월간 트렌드: ${context.monthlyTrend}\n\n`;
+    if (monthlyContext.goals && monthlyContext.goals.length > 0) {
+      text += `목표:\n${monthlyContext.goals.map((g: string, i: number) => `${i + 1}. ${g}`).join('\n')}\n\n`;
     }
     
-    if (context.achievements && context.achievements.length > 0) {
-      text += `주요 성과:\n${context.achievements.map((a: string, i: number) => `${i + 1}. ${a}`).join('\n')}\n\n`;
-    }
-    
-    if (context.nextMonthFocus && context.nextMonthFocus.length > 0) {
-      text += `다음 달 집중 영역:\n${context.nextMonthFocus.map((f: string, i: number) => `${i + 1}. ${f}`).join('\n')}\n`;
+    if (monthlyContext.nextMonthFocus && monthlyContext.nextMonthFocus.length > 0) {
+      text += `다음 달 집중 영역:\n${monthlyContext.nextMonthFocus.map((f: string, i: number) => `${i + 1}. ${f}`).join('\n')}\n`;
     }
   }
   

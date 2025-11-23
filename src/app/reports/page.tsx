@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/context/AuthContext';
+import type { DailyAnalysisResult, WeeklyAnalysisResult, MonthlyAnalysisResult } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { Calendar, TrendingUp, Lightbulb, Target, FileText, Sparkles, MessageSquare, Send, Save, Check, Trash2 } from 'lucide-react';
 import { RetrospectLayout } from '@/components/retrospect/RetrospectLayout';
@@ -29,18 +30,18 @@ function ReportsContent() {
   
   // 일간 분석
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [dailyAnalysis, setDailyAnalysis] = useState<any>(null);
+  const [dailyAnalysis, setDailyAnalysis] = useState<DailyAnalysisResult | null>(null);
   const [loadingDaily, setLoadingDaily] = useState(false);
   
   // 주간 분석
   const [selectedWeekStart, setSelectedWeekStart] = useState<string>('');
-  const [weeklyAnalysis, setWeeklyAnalysis] = useState<any>(null);
+  const [weeklyAnalysis, setWeeklyAnalysis] = useState<WeeklyAnalysisResult | null>(null);
   const [loadingWeekly, setLoadingWeekly] = useState(false);
   
   // 월간 분석
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
-  const [monthlyAnalysis, setMonthlyAnalysis] = useState<any>(null);
+  const [monthlyAnalysis, setMonthlyAnalysis] = useState<MonthlyAnalysisResult | null>(null);
   const [loadingMonthly, setLoadingMonthly] = useState(false);
 
   // AI 질문
@@ -429,7 +430,7 @@ function ReportsContent() {
     }
   };
 
-  const saveDailyReport = async (analysisResult: any, date: string) => {
+  const saveDailyReport = async (analysisResult: DailyAnalysisResult, date: string) => {
     if (!analysisResult || !date || !user) {
       console.warn('saveDailyReport: Missing parameters', { analysisResult: !!analysisResult, date, user: !!user });
       return;
@@ -626,7 +627,7 @@ function ReportsContent() {
     }
   };
 
-  const saveWeeklyReport = async (analysisResult: any, weekStart: string) => {
+  const saveWeeklyReport = async (analysisResult: WeeklyAnalysisResult, weekStart: string) => {
     if (!analysisResult || !weekStart || !user) {
       console.warn('saveWeeklyReport: Missing parameters', { analysisResult: !!analysisResult, weekStart, user: !!user });
       return;
@@ -817,7 +818,7 @@ function ReportsContent() {
     }
   };
 
-  const saveMonthlyReport = async (analysisResult: any) => {
+  const saveMonthlyReport = async (analysisResult: MonthlyAnalysisResult) => {
     if (!analysisResult || !user) {
       console.warn('saveMonthlyReport: Missing parameters', { analysisResult: !!analysisResult, user: !!user });
       return;

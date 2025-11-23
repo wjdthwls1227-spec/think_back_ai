@@ -10,11 +10,12 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { AdminNav } from '../AdminNav';
+import type { CommunityCase } from '@/types';
 
 export default function AdminCommunityCasesPage() {
   const { user, isAdmin } = useAuth();
   const router = useRouter();
-  const [cases, setCases] = useState<any[]>([]);
+  const [cases, setCases] = useState<CommunityCase[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -55,7 +56,7 @@ export default function AdminCommunityCasesPage() {
     }
   };
 
-  const handleEdit = (caseItem: any) => {
+  const handleEdit = (caseItem: CommunityCase) => {
     setEditingId(caseItem.id);
     setFormData({
       title: caseItem.title,
@@ -98,8 +99,9 @@ export default function AdminCommunityCasesPage() {
 
       handleCancel();
       loadCases();
-    } catch (error: any) {
-      alert(`오류: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      alert(`오류: ${errorMessage}`);
     }
   };
 
@@ -114,8 +116,9 @@ export default function AdminCommunityCasesPage() {
 
       if (error) throw error;
       loadCases();
-    } catch (error: any) {
-      alert(`오류: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      alert(`오류: ${errorMessage}`);
     }
   };
 

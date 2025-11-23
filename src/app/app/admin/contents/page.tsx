@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { Content } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,7 +28,7 @@ const typeLabels = {
 export default function AdminContentsPage() {
   const { user, isAdmin, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [contents, setContents] = useState<any[]>([]);
+  const [contents, setContents] = useState<Content[]>([]);
   const [loading, setLoading] = useState(true);
 
   // 컴포넌트 마운트 확인
@@ -90,15 +91,16 @@ export default function AdminContentsPage() {
       console.log('loadContents: Fetched contents:', data?.length || 0, 'items');
       console.log('loadContents: Contents data:', data);
       setContents(data || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error loading contents:', error);
-      alert(`콘텐츠 목록을 불러오는 중 오류가 발생했습니다: ${error instanceof Error ? error.message : String(error)}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert(`콘텐츠 목록을 불러오는 중 오류가 발생했습니다: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (content: any) => {
+  const handleEdit = (content: Content) => {
     setEditingId(content.id);
     setFormData({
       slug: content.slug,
@@ -172,7 +174,7 @@ export default function AdminContentsPage() {
         }
       }
 
-      const contentData: any = {
+      const contentData: Partial<Content> = {
         slug: formData.slug.trim(),
         type: formData.type,
         title: formData.title.trim(),
@@ -194,8 +196,9 @@ export default function AdminContentsPage() {
 
       // null 값 제거 (Supabase가 null을 허용하지만, 빈 문자열과 혼동 방지)
       Object.keys(contentData).forEach(key => {
-        if (contentData[key] === '') {
-          contentData[key] = null;
+        const typedKey = key as keyof typeof contentData;
+        if (contentData[typedKey] === '') {
+          (contentData as Record<string, unknown>)[typedKey] = null;
         }
       });
 
@@ -271,14 +274,15 @@ export default function AdminContentsPage() {
       console.log('Reloading contents list...');
       await loadContents();
       console.log('Contents list reloaded');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Submit error - Full error:', error);
       console.error('Submit error - Type:', typeof error);
-      console.error('Submit error - Keys:', Object.keys(error || {}));
+      console.error('Submit error - Keys:', error && typeof error === 'object' ? Object.keys(error) : []);
       
-      const errorMessage = error?.message || error?.error_description || '알 수 없는 오류가 발생했습니다.';
-      const errorDetails = error?.details || error?.hint || error?.error || '';
-      const errorCode = error?.code || '';
+      const errorObj = error && typeof error === 'object' ? error as { message?: string; error_description?: string; details?: string; hint?: string; error?: string; code?: string } : null;
+      const errorMessage = errorObj?.message || errorObj?.error_description || '알 수 없는 오류가 발생했습니다.';
+      const errorDetails = errorObj?.details || errorObj?.hint || errorObj?.error || '';
+      const errorCode = errorObj?.code || '';
       
       let fullErrorMessage = `오류: ${errorMessage}`;
       if (errorCode) {
@@ -304,8 +308,9 @@ export default function AdminContentsPage() {
 
       if (error) throw error;
       loadContents();
-    } catch (error: any) {
-      alert(`오류: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      alert(`오류: ${errorMessage}`);
     }
   };
 
@@ -380,7 +385,7 @@ export default function AdminContentsPage() {
                 </label>
                 <select
                   value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value as 'workbook' | 'cohort' | 'bundle' })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800"
                   required
                 >

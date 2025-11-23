@@ -37,7 +37,7 @@ export function EmailPasswordForm() {
     try {
       await signInWithPassword(email, password);
       // 로그인 성공 시 리다이렉트는 AuthContext나 페이지에서 처리
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Login error:', err);
       if (err.message === 'EMAIL_NOT_CONFIRMED' || err.message?.includes('Email not confirmed') || err.message?.includes('email_not_confirmed')) {
         setError('이메일 인증이 필요합니다. 가입하신 이메일을 확인해주세요.');

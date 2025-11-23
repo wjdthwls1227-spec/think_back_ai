@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
+import type { KPTContent, PMIContent, FreeContent, FourLContent } from '@/types';
 import { Calendar, Search, FileText, Edit, X, Save } from 'lucide-react';
 import { RetrospectLayout } from '@/components/retrospect/RetrospectLayout';
 import { FreeTemplate } from '@/components/retrospective/FreeTemplate';
@@ -23,7 +24,7 @@ interface Journal {
   type: 'daily' | 'weekly' | 'monthly';
   date: string;
   title: string | null;
-  content: any;
+  content: KPTContent | PMIContent | FreeContent | FourLContent;
   created_at: string;
   updated_at: string;
 }
@@ -172,7 +173,7 @@ function HistoryContent() {
     }
   };
 
-  const getContentType = (content: any): 'KPT' | 'PMI' | 'FREE' | '4L' => {
+  const getContentType = (content: KPTContent | PMIContent | FreeContent | FourLContent): 'KPT' | 'PMI' | 'FREE' | '4L' => {
     if (content.keep || content.problem || content.try) return 'KPT';
     if (content.plus || content.minus || content.interesting) return 'PMI';
     if (content.liked || content.learned || content.lacked || content.longedFor) return '4L';
@@ -594,7 +595,7 @@ function EditJournalContent({
   );
 }
 
-function getContentType(content: any): 'KPT' | 'PMI' | 'FREE' | '4L' {
+function getContentType(content: KPTContent | PMIContent | FreeContent | FourLContent): 'KPT' | 'PMI' | 'FREE' | '4L' {
   if (content.keep || content.problem || content.try) return 'KPT';
   if (content.plus || content.minus || content.interesting) return 'PMI';
   if (content.liked || content.learned || content.lacked || content.longedFor) return '4L';

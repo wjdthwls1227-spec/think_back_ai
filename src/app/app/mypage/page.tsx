@@ -14,11 +14,11 @@ function MyPageContent() {
   const { user, loading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState<any>(null);
-  const [userContents, setUserContents] = useState<any[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [userContents, setUserContents] = useState<Array<{ id: string; contents: Content }>>([]);
   const [contentCount, setContentCount] = useState(0);
   const [journalCount, setJournalCount] = useState(0);
-  const [recentJournals, setRecentJournals] = useState<any[]>([]);
+  const [recentJournals, setRecentJournals] = useState<Journal[]>([]);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   useEffect(() => {

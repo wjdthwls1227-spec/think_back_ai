@@ -79,7 +79,7 @@ function htmlToEditorData(html: string): FreeContent {
   // 간단한 HTML 파싱 (실제로는 더 정교한 파서가 필요할 수 있음)
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
-  const blocks: any[] = [];
+  const blocks: Array<{ type: string; data: Record<string, unknown> }> = [];
 
   doc.body.childNodes.forEach((node) => {
     if (node.nodeType === Node.ELEMENT_NODE) {

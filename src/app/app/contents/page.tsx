@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { BookOpen, Users, Package, ArrowRight } from 'lucide-react';
 import { createClient } from '@/lib/supabase-server';
 import { Progress } from '@/components/ui/progress';
+import type { UserContent, Content } from '@/types';
 
 const typeIcons = {
   workbook: BookOpen,
@@ -61,7 +62,7 @@ export default async function MyContentsPage() {
 
       {userContents && userContents.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {userContents.map((uc: any) => {
+          {userContents.map((uc: UserContent & { contents: Content }) => {
             const content = uc.contents;
             if (!content) return null;
 
