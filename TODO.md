@@ -3,13 +3,13 @@
 ## 🔴 긴급 (High Priority)
 
 ### 1. 타입 안정성 개선
-- [ ] `any` 타입을 적절한 타입으로 변경
-  - `src/app/api/journals/**/*.ts` - 여러 파일에서 `any` 사용
-  - `src/app/app/admin/**/*.tsx` - Admin 페이지들
-  - `src/app/reports/page.tsx` - 리포트 페이지
-  - `src/components/**/*.tsx` - 여러 컴포넌트들
+- [x] `any` 타입을 적절한 타입으로 변경
+  - [x] `src/app/reports/page.tsx` - 리포트 페이지 (dailyAnalysis, weeklyAnalysis, monthlyAnalysis)
+  - [x] `src/app/app/admin/retrospect-tools/page.tsx` - category 타입 및 error 처리
+  - [x] `src/components/admin/RichTextEditor.tsx` - blocks 배열 타입
+  - [x] `src/types/index.ts` - UserInfo 인터페이스 추가
 - [ ] 타입 정의 파일 정리 및 확장
-  - `src/types/index.ts` - 더 구체적인 타입 정의 추가
+  - `src/types/index.ts` - 더 구체적인 타입 정의 추가 (진행 중)
 
 ### 2. RLS 정책 검증
 - [ ] `contents` 테이블 RLS 정책이 제대로 작동하는지 확인

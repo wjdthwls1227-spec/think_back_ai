@@ -37,7 +37,7 @@ export default async function ProtectedLayout({
                 <Home className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" />
                 <span className="font-semibold text-gray-900 dark:text-white">앱</span>
               </Link>
-              <nav className="hidden md:flex space-x-4">
+              <nav className="flex space-x-2 sm:space-x-4 overflow-x-auto">
                 <NavLink href="/app/dashboard" icon={Home} label="대시보드" />
                 <NavLink href="/app/journal" icon={FileText} label="회고 작성" />
                 <NavLink href="/app/contents" icon={BookOpen} label="내 콘텐츠" />
@@ -75,13 +75,13 @@ function NavLink({
     <Link
       href={href}
       className={cn(
-        'inline-flex items-center px-3 py-2 text-sm font-medium rounded-md',
+        'inline-flex items-center px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-md whitespace-nowrap',
         'text-gray-700 hover:text-gray-900 hover:bg-gray-100',
         'dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700',
         'transition-colors'
       )}
     >
-      <Icon className="w-4 h-4 mr-2" />
+      <Icon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
       {label}
     </Link>
   );

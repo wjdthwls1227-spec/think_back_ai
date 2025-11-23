@@ -61,7 +61,7 @@ export function Navigation() {
               <span>ThinkBack AI</span>
               <span className="text-xs text-gray-500 dark:text-gray-400">회고리즘</span>
             </Link>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+            <div className="ml-2 sm:ml-6 flex space-x-2 sm:space-x-8 overflow-x-auto">
               {/* 공개 영역 네비게이션 (로그인 여부와 관계없이 항상 표시) */}
               {publicNavItems.map((item) => {
                 const isActive = 
@@ -73,7 +73,7 @@ export function Navigation() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                      'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium whitespace-nowrap',
                       isActive
                         ? 'border-blue-500 text-gray-900 dark:text-gray-100 dark:border-blue-400'
                         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-600'
@@ -88,7 +88,7 @@ export function Navigation() {
                 <Link
                   href="/app/admin/contents"
                   className={cn(
-                    'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
+                    'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium whitespace-nowrap',
                     pathname.startsWith('/app/admin')
                       ? 'border-blue-500 text-gray-900 dark:text-gray-100 dark:border-blue-400'
                       : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-600'

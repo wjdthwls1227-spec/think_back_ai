@@ -10,7 +10,7 @@ export function AdminNav() {
 
   return (
     <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
-      <nav className="flex space-x-4">
+      <nav className="flex space-x-2 sm:space-x-4 overflow-x-auto">
         <AdminNavLink 
           href="/app/admin/contents" 
           icon={BookOpen} 
@@ -49,13 +49,13 @@ function AdminNavLink({
     <Link
       href={href}
       className={cn(
-        'inline-flex items-center px-4 py-2 border-b-2 text-sm font-medium transition-colors',
+        'inline-flex items-center px-2 sm:px-4 py-2 border-b-2 text-xs sm:text-sm font-medium transition-colors whitespace-nowrap',
         isActive
           ? 'text-blue-600 border-blue-600 dark:text-blue-400 dark:border-blue-400'
           : 'text-gray-600 hover:text-gray-900 border-transparent hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200'
       )}
     >
-      <Icon className="w-4 h-4 mr-2" />
+      <Icon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
       {label}
     </Link>
   );
