@@ -52,7 +52,7 @@ export async function CommunityCasesSection() {
                     회고로 성장한 개발자 {i}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                    "매일 회고를 통해 문제 해결 능력이 크게 향상되었습니다"
+                    &quot;매일 회고를 통해 문제 해결 능력이 크게 향상되었습니다&quot;
                   </p>
                   <p className="text-xs text-blue-600 dark:text-blue-400">
                     개인 회고 · 커리어

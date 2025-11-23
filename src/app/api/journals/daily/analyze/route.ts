@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     
     // 쿠키에서 Supabase 클라이언트 생성
     const cookieStore = await cookies();
-    let supabase = createServerClient<Database>(
+    const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
@@ -562,4 +562,5 @@ ${dailyContent}
 - learnings: 오늘 배우거나 깨달은 점 3개
 - tomorrowFocus: 내일 집중하거나 개선할 점 3개
 - 모든 내용은 한국어로 작성`;
+}
 
