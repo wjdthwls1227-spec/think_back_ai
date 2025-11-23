@@ -28,13 +28,13 @@ function editorDataToHTML(data: FreeContent): string {
         return `<h${level}>${blockData?.text || ''}</h${level}>`;
       
       case 'list':
-        const items = blockData?.items || [];
+        const items = (blockData?.items as string[]) || [];
         const style = blockData?.style === 'ordered' ? 'ol' : 'ul';
         const listItems = items.map((item: string) => `<li>${item}</li>`).join('');
         return `<${style}>${listItems}</${style}>`;
       
       case 'checklist':
-        const checklistItems = blockData?.items || [];
+        const checklistItems = (blockData?.items as Array<{ text: string; checked: boolean }>) || [];
         const checklistHTML = checklistItems.map((item: { text: string; checked: boolean }) => 
           `<li><input type="checkbox" ${item.checked ? 'checked' : ''} disabled> ${item.text}</li>`
         ).join('');
@@ -44,7 +44,7 @@ function editorDataToHTML(data: FreeContent): string {
         return `<blockquote>${blockData?.text || ''}</blockquote>`;
       
       case 'table':
-        const content = blockData?.content || [];
+        const content = (blockData?.content as string[][]) || [];
         const rows = content.map((row: string[]) => 
           `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`
         ).join('');
