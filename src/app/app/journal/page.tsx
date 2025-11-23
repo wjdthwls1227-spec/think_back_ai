@@ -333,7 +333,7 @@ export default function JournalPage() {
       {/* 템플릿별 회고 작성 영역 */}
       {templateType === 'FREE' && (
         <FreeTemplate
-          initialData={null}
+          initialData={undefined}
           onSave={handleSave}
           saving={saving}
         />
